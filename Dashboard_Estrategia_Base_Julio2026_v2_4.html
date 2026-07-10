@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Estrategia de Base — Julio 2026 | NETCALL</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.32.0/plotly.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F4F6F9;color:#1a1a2e;display:flex;height:100vh;overflow:hidden;}
+.sidebar{width:248px;background:#003087;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sb-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.12);}
+.sb-badge{background:#FF6B00;color:#fff;font-size:10px;font-weight:800;letter-spacing:2.5px;padding:3px 9px;border-radius:4px;display:inline-block;margin-bottom:9px;}
+.sb-title{color:#fff;font-size:13px;font-weight:700;line-height:1.5;}
+.sb-meta{color:rgba(255,255,255,0.42);font-size:11px;margin-top:4px;line-height:1.4;}
+.sb-section{padding:12px 0 4px;}
+.sb-label{color:rgba(255,255,255,0.35);font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;padding:0 18px 7px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;color:rgba(255,255,255,0.62);font-size:12.5px;font-weight:500;transition:all .18s;border-left:3px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.11);color:#fff;border-left-color:#FF6B00;}
+.nav-icon{font-size:15px;width:20px;text-align:center;}
+.sb-stats{margin:12px 16px;background:rgba(255,255,255,0.06);border-radius:8px;padding:14px 12px;}
+.sb-stat{margin-bottom:12px;}
+.sb-stat:last-child{margin-bottom:0;}
+.sb-stat-lbl{color:rgba(255,255,255,0.42);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;}
+.sb-stat-val{color:#fff;font-size:19px;font-weight:800;line-height:1;}
+.sb-stat-val.orange{color:#FF6B00;}
+.sb-stat-val.green{color:#27AE60;}
+.sb-sep{border:none;border-top:1px solid rgba(255,255,255,0.1);margin:10px 0;}
+.sb-footer{margin-top:auto;padding:13px 18px;border-top:1px solid rgba(255,255,255,0.1);}
+.sb-foot-txt{color:rgba(255,255,255,0.35);font-size:10.5px;line-height:1.6;}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:#fff;padding:13px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:20;box-shadow:0 1px 4px rgba(0,0,48,0.06);}
+.tb-title{font-size:16px;font-weight:800;color:#003087;}
+.tb-sub{font-size:11px;color:#6b7280;margin-top:2px;}
+.tb-pills{display:flex;gap:7px;}
+.pill{background:#EFF6FF;color:#003087;font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:16px;border:1px solid #BFDBFE;}
+.pill.orange{background:#FFF3E0;color:#C05621;border-color:#FBD38D;}
+.pill.green{background:#ECFDF5;color:#065F46;border-color:#6EE7B7;}
+.page{display:none;padding:20px 24px 30px;}
+.page.active{display:block;}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:13px;margin-bottom:20px;}
+.kpi{background:#fff;border-radius:10px;padding:16px 14px;box-shadow:0 1px 3px rgba(0,0,48,0.07);border-left:4px solid #003087;}
+.kpi.orange{border-left-color:#FF6B00;}
+.kpi.green{border-left-color:#27AE60;}
+.kpi.yellow{border-left-color:#F39C12;}
+.kpi.teal{border-left-color:#1ABC9C;}
+.kpi.purple{border-left-color:#9B59B6;}
+.kpi-lbl{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:800;color:#003087;line-height:1;}
+.kpi-val.orange{color:#FF6B00;}
+.kpi-val.green{color:#27AE60;}
+.kpi-val.yellow{color:#F39C12;}
+.kpi-val.teal{color:#1ABC9C;}
+.kpi-val.sm{font-size:16px;}
+.kpi-note{font-size:10.5px;color:#9ca3af;margin-top:4px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:18px;}
+.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:18px;}
+.grid-1-2{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:18px;}
+.cc{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,48,0.07);}
+.cc.span2{grid-column:1/-1;}
+.cc-title{font-size:12px;font-weight:700;color:#003087;margin-bottom:3px;}
+.cc-sub{font-size:10.5px;color:#9ca3af;margin-bottom:12px;}
+.sec-hdr{margin:4px 0 14px;}
+.sec-title{font-size:17px;font-weight:800;color:#003087;}
+.sec-sub{font-size:11.5px;color:#6b7280;margin-top:3px;}
+.tbl-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,48,0.07);margin-bottom:18px;overflow-x:auto;}
+.tbl-title{font-size:12px;font-weight:700;color:#003087;margin-bottom:11px;}
+table{width:100%;border-collapse:collapse;font-size:11px;}
+thead tr{background:#003087;}
+thead th{color:#fff;padding:8px 9px;text-align:center;font-weight:700;white-space:nowrap;font-size:10.5px;}
+thead th:first-child{text-align:left;}
+tbody tr{border-bottom:1px solid #f0f4f8;}
+tbody tr:hover{background:#f8faff;}
+tbody tr.tot{background:#EFF6FF;font-weight:700;}
+tbody td{padding:7px 9px;text-align:center;white-space:nowrap;}
+tbody td:first-child{text-align:left;font-weight:600;color:#1e3a5f;}
+.bg{display:inline-block;padding:2px 7px;border-radius:11px;font-size:10px;font-weight:700;}
+.bg-g{background:#D1FAE5;color:#065F46;}
+.bg-y{background:#FEF3C7;color:#92400E;}
+.bg-r{background:#FEE2E2;color:#991B1B;}
+.bg-n{background:#F3F4F6;color:#6B7280;}
+.bg-b{background:#DBEAFE;color:#1E40AF;}
+.banner{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:7px;padding:10px 14px;margin-bottom:16px;font-size:11.5px;color:#1E40AF;display:flex;gap:8px;align-items:flex-start;line-height:1.5;}
+/* SKILL MATRIX */
+.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+.skill-card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,48,0.07);border-top:4px solid;}
+.sk-m1{border-top-color:#003087;}
+.sk-m2{border-top-color:#1a6abf;}
+.sk-m3{border-top-color:#FF6B00;}
+.sk-m5{border-top-color:#27AE60;}
+.sk-ojt{border-top-color:#9B59B6;}
+.sk-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0f4f8;}
+.sk-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:5px;color:#fff;}
+.sk-base-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px;}
+.sk-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.sk-lbl{font-size:10px;font-weight:600;color:#6b7280;text-transform:uppercase;}
+.sk-val{font-size:13px;font-weight:800;color:#003087;}
+.sk-val.orange{color:#FF6B00;}
+.sk-val.green{color:#27AE60;}
+.sk-val.purple{color:#9B59B6;}
+.decil-chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
+.dc{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;}
+.dc-prio{background:#003087;color:#fff;}
+.dc-mid{background:#E3F0FF;color:#003087;}
+.dc-ojt{background:#F3E8FF;color:#7C3AED;}
+/* DECIL MATRIX */
+.matrix-wrap{overflow-x:auto;margin-bottom:18px;}
+.dec-matrix{border-collapse:collapse;font-size:11px;min-width:600px;width:100%;}
+.dec-matrix th,.dec-matrix td{padding:8px 10px;text-align:center;border:1px solid #e5e7eb;}
+.dec-matrix th{background:#003087;color:#fff;font-weight:700;}
+.dec-matrix td:first-child{text-align:left;font-weight:700;background:#F8FAFF;color:#003087;white-space:nowrap;}
+.dm-yes{background:#003087;color:#fff;border-radius:4px;font-size:10px;font-weight:700;}
+.dm-yes.m1{background:#003087;}
+.dm-yes.m2{background:#1a6abf;}
+.dm-yes.m3{background:#FF6B00;}
+.dm-yes.m5{background:#27AE60;}
+.dm-yes.ojt{background:#9B59B6;}
+.dm-no{color:#e5e7eb;}
+/* CALENDAR BAR */
+.cal-section{margin-bottom:18px;}
+.cal-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.cal-label{width:120px;font-size:11.5px;font-weight:700;color:#003087;flex-shrink:0;}
+.cal-bar-wrap{flex:1;background:#F4F6F9;border-radius:6px;height:28px;position:relative;overflow:hidden;}
+.cal-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-weight:700;color:#fff;transition:width .5s;}
+.cal-sub{font-size:10px;color:#9ca3af;margin-top:3px;}
+/* STRAT CARDS */
+.strat-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+.strat-c{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(0,0,48,0.07);}
+.strat-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:11px;border-bottom:2px solid #e5e7eb;}
+.plan-badge{color:#fff;font-size:12px;font-weight:800;padding:3px 11px;border-radius:6px;}
+.pa{background:#003087;}.pb{background:#FF6B00;}
+.step{display:flex;gap:9px;margin-bottom:10px;}
+.step-n{flex-shrink:0;width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;}
+.sna{background:#EFF6FF;color:#003087;}.snb{background:#FFF3E0;color:#FF6B00;}
+.step-t{font-size:10px;font-weight:700;color:#6b7280;margin-bottom:2px;}
+.step-d{font-size:11px;color:#374151;line-height:1.5;}
+/* INFORME PAGE */
+.inf-hero{background:linear-gradient(135deg,#003087 0%,#0a4ea6 60%,#1a6abf 100%);border-radius:12px;padding:26px 24px;color:#fff;margin-bottom:20px;}
+.inf-hero-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;opacity:.65;margin-bottom:8px;}
+.inf-hero-main{font-size:21px;font-weight:800;margin-bottom:5px;}
+.inf-hero-sub{font-size:12.5px;opacity:.75;margin-bottom:18px;}
+.inf-hero-stats{display:flex;gap:0;flex-wrap:wrap;}
+.inf-stat{padding:0 22px;border-right:1px solid rgba(255,255,255,.2);}
+.inf-stat:first-child{padding-left:0;}
+.inf-stat:last-child{border-right:none;}
+.inf-stat-val{font-size:24px;font-weight:800;}
+.inf-stat-val.orange{color:#FF6B00;}
+.inf-stat-val.green{color:#27AE60;}
+.inf-stat-lbl{font-size:10.5px;opacity:.65;margin-top:1px;}
+.inf-section{background:#fff;border-radius:10px;padding:18px;box-shadow:0 1px 3px rgba(0,0,48,0.07);margin-bottom:16px;}
+.inf-sec-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:11px;border-bottom:2px solid #e5e7eb;}
+.inf-sec-ico{font-size:20px;}
+.inf-sec-title{font-size:14px;font-weight:800;color:#003087;}
+.inf-sec-sub{font-size:11px;color:#9ca3af;}
+.inf-p{font-size:12px;color:#374151;line-height:1.7;margin-bottom:10px;}
+.inf-p:last-child{margin-bottom:0;}
+.inf-insight{background:#F8FAFF;border-left:3px solid #003087;border-radius:0 6px 6px 0;padding:10px 12px;margin:10px 0;font-size:11.5px;color:#1e3a5f;line-height:1.6;}
+.inf-insight.orange{background:#FFF8F0;border-color:#FF6B00;color:#7C3000;}
+.inf-insight.green{background:#F0FDF4;border-color:#27AE60;color:#064E3B;}
+.inf-insight.yellow{background:#FFFBEB;border-color:#F39C12;color:#78350F;}
+.inf-kpi-mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:12px 0;}
+.inf-kpi-m{background:#F8FAFF;border-radius:7px;padding:10px 12px;text-align:center;}
+.inf-kpi-m-val{font-size:18px;font-weight:800;color:#003087;}
+.inf-kpi-m-val.orange{color:#FF6B00;}
+.inf-kpi-m-val.green{color:#27AE60;}
+.inf-kpi-m-lbl{font-size:10px;color:#6b7280;font-weight:600;text-transform:uppercase;margin-top:3px;}
+.proy-breakdown{margin:12px 0;}
+.proy-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.proy-label{width:130px;font-size:11.5px;font-weight:600;color:#374151;flex-shrink:0;}
+.proy-bar-wrap{flex:1;background:#F4F6F9;border-radius:4px;height:22px;overflow:hidden;}
+.proy-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:10.5px;font-weight:700;color:#fff;}
+.proy-val{width:60px;font-size:11.5px;font-weight:700;color:#003087;text-align:right;flex-shrink:0;}
+.rec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+.rec-card{background:#F8FAFF;border-radius:7px;padding:12px;display:flex;gap:8px;}
+.rec-ico{font-size:18px;flex-shrink:0;}
+.rec-title{font-size:11.5px;font-weight:700;color:#003087;margin-bottom:4px;}
+.rec-txt{font-size:10.5px;color:#374151;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-badge">NETCALL</div>
+    <div class="sb-title">Dashboard Estrategia<br>de Base — Julio 2026</div>
+    <div class="sb-meta">Campaña Migraciones Regular<br>ENTEL Perú · Outbound</div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">Navegación</div>
+    <div class="nav-item active" onclick="goPage('comp')" id="nav-comp">
+      <span class="nav-icon">📊</span><span>Comparativo Bases</span>
+    </div>
+    <div class="nav-item" onclick="goPage('estr')" id="nav-estr">
+      <span class="nav-icon">📦</span><span>Estrategia y Distribución</span>
+    </div>
+    <div class="nav-item" onclick="goPage('info')" id="nav-info">
+      <span class="nav-icon">📋</span><span>Informe</span>
+    </div>
+  </div>
+  <hr class="sb-sep">
+  <div class="sb-stats">
+    <div class="sb-stat">
+      <div class="sb-stat-lbl">Base Total Julio</div>
+      <div class="sb-stat-val">378,000</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-lbl">Proyección Ventas</div>
+      <div class="sb-stat-val orange">22,665</div>
+    </div>
+    <div class="sb-stat">
+      <div class="sb-stat-lbl">HC Total</div>
+      <div class="sb-stat-val green">115</div>
+    </div>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-foot-txt">Julio 2026 · Netcall Group<br>Fuente: Estrategia Distribución<br>Base Julio 2026</div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="tb-title" id="pg-title">Comparativo Bases — Migraciones Regular</div>
+      <div class="tb-sub" id="pg-sub">Análisis histórico Ene–Jul 2026 · Efectividad por decil y plan · Proyección total: 22,665 ventas</div>
+    </div>
+    <div class="tb-pills">
+      <div class="pill">📅 Julio 2026</div>
+      <div class="pill orange">MIGRA REGULAR</div>
+      <div class="pill green">Proy. 22,665 ✓</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       HOJA 1: COMPARATIVO BASES
+  ══════════════════════════════════════════════════ -->
+  <div class="page active" id="page-comp">
+    <div class="kpi-row" style="margin-top:18px;">
+      <div class="kpi">
+        <div class="kpi-lbl">Base Migra Regular Jul</div>
+        <div class="kpi-val">358,000</div>
+        <div class="kpi-note">↔ Sin variación vs Junio</div>
+      </div>
+      <div class="kpi teal">
+        <div class="kpi-lbl">Base Blindaje Jul</div>
+        <div class="kpi-val teal">20,000</div>
+        <div class="kpi-note">D0–D2 · Skill M5 · 16 HC</div>
+      </div>
+      <div class="kpi orange">
+        <div class="kpi-lbl">Proy. Ventas Migraciones</div>
+        <div class="kpi-val orange">19,690</div>
+        <div class="kpi-note">Efect. proy. 5.50%</div>
+      </div>
+      <div class="kpi" style="border-left-color:#1ABC9C;">
+        <div class="kpi-lbl">Proy. Ventas Blindaje</div>
+        <div class="kpi-val sm" style="color:#1ABC9C;font-size:22px;">2,975</div>
+        <div class="kpi-note">Efect. proy. 14.87%</div>
+      </div>
+      <div class="kpi green">
+        <div class="kpi-lbl">Total Proyección Jul</div>
+        <div class="kpi-val green">22,665</div>
+        <div class="kpi-note">Migra 19,690 + Blind. 2,975</div>
+      </div>
+      <div class="kpi yellow">
+        <div class="kpi-lbl">Decil + Efectivo</div>
+        <div class="kpi-val sm yellow">D0 · 9.70%</div>
+        <div class="kpi-note">D0 Blind. 18.39% máximo</div>
+      </div>
+    </div>
+
+    <div class="grid-2-1">
+      <div class="cc">
+        <div class="cc-title">Evolución Histórica de Base — Migraciones Regular + Blindaje · Ene–Jul 2026</div>
+        <div class="cc-sub">Crecimiento mensual de registros disponibles para gestión</div>
+        <div id="c-evol" style="height:300px;"></div>
+      </div>
+      <div class="cc">
+        <div class="cc-title">Efectividad Proyectada por Decil — Julio 2026</div>
+        <div class="cc-sub">🟢≥7.7% · 🟡6–7.6% · 🔴&lt;6%</div>
+        <div id="c-efec-decil" style="height:300px;"></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="cc">
+        <div class="cc-title">Distribución de Base por Plan Tarifario — Julio 2026</div>
+        <div class="cc-sub">Q total: 358,000 registros Migraciones</div>
+        <div id="c-plan-donut" style="height:290px;"></div>
+      </div>
+      <div class="cc">
+        <div class="cc-title">Efectividad Proyectada por Plan de Tarifa · Jul 2026</div>
+        <div class="cc-sub">Umbrales de conversión: verde ≥7.7% · amarillo 6–7.6% · rojo &lt;6%</div>
+        <div id="c-efec-plan" style="height:290px;"></div>
+      </div>
+    </div>
+
+    <div class="cc span2" style="margin-bottom:18px;">
+      <div class="cc-title">Tendencia Histórica de Efectividad — Deciles D0–D4 · Ene–Jun 2026</div>
+      <div class="cc-sub">Comportamiento de conversión por segmento en los 6 meses previos · puntos de umbral marcados</div>
+      <div id="c-efec-hist" style="height:270px;"></div>
+    </div>
+
+    <!-- TABLA MIGRACIONES -->
+    <div class="tbl-card">
+      <div class="tbl-title">📋 Comparativo de Bases por Decil — Migraciones Regular · Enero → Julio 2026</div>
+      <table>
+        <thead><tr>
+          <th>Decil</th>
+          <th>Q Ene</th><th>Efec Ene</th>
+          <th>Q Feb</th><th>Efec Feb</th>
+          <th>Q Mar</th><th>Efec Mar</th>
+          <th>Q Abr</th><th>Efec Abr</th>
+          <th>Q May</th><th>Efec May</th>
+          <th>Q Jun</th><th>Efec Jun</th>
+          <th>Q Jul</th><th>Dif. Q Jul-Jun</th><th>Proy. Efec Jul</th><th>Proy. Ventas</th>
+        </tr></thead>
+        <tbody id="tb-dec-migra"></tbody>
+      </table>
+    </div>
+
+    <!-- TABLA BLINDAJE -->
+    <div class="tbl-card">
+      <div class="tbl-title">🛡️ Comparativo de Bases por Decil — Blindaje · Enero → Julio 2026</div>
+      <table>
+        <thead><tr>
+          <th>Decil</th>
+          <th>Q Ene</th><th>Efec Ene</th>
+          <th>Q Feb</th><th>Efec Feb</th>
+          <th>Q Mar</th><th>Efec Mar</th>
+          <th>Q Abr</th><th>Efec Abr</th>
+          <th>Q May</th><th>Efec May</th>
+          <th>Q Jun</th><th>Efec Jun</th>
+          <th>Q Jul</th><th>Proy. Efec Jul</th><th>Proy. Ventas</th>
+        </tr></thead>
+        <tbody id="tb-dec-blind"></tbody>
+      </table>
+    </div>
+
+    <!-- TABLA PLANES -->
+    <div class="tbl-card">
+      <div class="tbl-title">📋 Comparativo de Bases por Plan Tarifario — Migraciones Regular · Enero → Julio 2026</div>
+      <table>
+        <thead><tr>
+          <th>Plan</th>
+          <th>Q Ene</th><th>%</th><th>Q Feb</th><th>%</th>
+          <th>Q Mar</th><th>%</th><th>Q Abr</th><th>%</th>
+          <th>Q May</th><th>%</th><th>Q Jun</th><th>%</th>
+          <th>Q Jul</th><th>%Jul</th><th>Proy.Efec</th><th>Proy.Vent</th>
+        </tr></thead>
+        <tbody id="tb-plan"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       HOJA 2: ESTRATEGIA Y DISTRIBUCIÓN
+  ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-estr">
+    <div class="kpi-row" style="margin-top:18px;">
+      <div class="kpi"><div class="kpi-lbl">Base Total Julio</div><div class="kpi-val">378,000</div><div class="kpi-note">Migra + Blindaje</div></div>
+      <div class="kpi"><div class="kpi-lbl">Base Sin Marca</div><div class="kpi-val sm">318,733</div><div class="kpi-note">79 HC · 25 días · M1+M2+OJT</div></div>
+      <div class="kpi orange"><div class="kpi-lbl">Base Con Marca</div><div class="kpi-val orange sm">39,267</div><div class="kpi-note">20 HC · 16 días · M3+OJT</div></div>
+      <div class="kpi green"><div class="kpi-lbl">Base Blindaje</div><div class="kpi-val green sm">20,000</div><div class="kpi-note">16 HC · 15 días · M5</div></div>
+      <div class="kpi yellow"><div class="kpi-lbl">HC Total</div><div class="kpi-val yellow">115</div><div class="kpi-note">Asesores conectados Jul</div></div>
+      <div class="kpi" style="border-left-color:#9B59B6;"><div class="kpi-lbl">SPD Proy.</div><div class="kpi-val sm" style="color:#9B59B6;">9.47</div><div class="kpi-note">Ventas/HC/Día Jul</div></div>
+    </div>
+
+    <!-- SKILL CARDS -->
+    <div class="sec-hdr">
+      <div class="sec-title">📌 Distribución por Skill y Decil — Julio 2026</div>
+      <div class="sec-sub">Asignación estratégica de registros por segmento de calidad · priorización D0–D3 en skills de mayor HC</div>
+    </div>
+
+    <div class="skill-grid">
+      <!-- M1 -->
+      <div class="skill-card sk-m1">
+        <div class="sk-header">
+          <div class="sk-badge" style="background:#003087;">M1 — Sin Marca</div>
+          <div class="sk-base-tag" style="background:#EFF6FF;color:#003087;">Prioridad Alta</div>
+        </div>
+        <div class="sk-row"><div class="sk-lbl">Q Registros</div><div class="sk-val">158,538</div></div>
+        <div class="sk-row"><div class="sk-lbl">HC Asesores</div><div class="sk-val">56</div></div>
+        <div class="sk-row"><div class="sk-lbl">Días de Gestión</div><div class="sk-val">25</div></div>
+        <div class="sk-row"><div class="sk-lbl">Base x Día</div><div class="sk-val">6,342</div></div>
+        <div class="sk-row"><div class="sk-lbl">% del Total SM</div><div class="sk-val">49.7%</div></div>
+        <div class="decil-chips">
+          <span class="dc dc-prio">D0</span><span class="dc dc-prio">D1</span>
+          <span class="dc dc-prio">D2</span><span class="dc dc-prio">D3</span>
+        </div>
+      </div>
+      <!-- M2 -->
+      <div class="skill-card" style="border-top-color:#1a6abf;">
+        <div class="sk-header">
+          <div class="sk-badge" style="background:#1a6abf;">M2 — Sin Marca</div>
+          <div class="sk-base-tag" style="background:#EFF6FF;color:#1a6abf;">Prioridad Media</div>
+        </div>
+        <div class="sk-row"><div class="sk-lbl">Q Registros</div><div class="sk-val">119,570</div></div>
+        <div class="sk-row"><div class="sk-lbl">HC Asesores</div><div class="sk-val">23</div></div>
+        <div class="sk-row"><div class="sk-lbl">Días de Gestión</div><div class="sk-val">25</div></div>
+        <div class="sk-row"><div class="sk-lbl">Base x Día</div><div class="sk-val">4,783</div></div>
+        <div class="sk-row"><div class="sk-lbl">% del Total SM</div><div class="sk-val">37.5%</div></div>
+        <div class="decil-chips">
+          <span class="dc dc-mid">D4</span><span class="dc dc-mid">D5</span>
+          <span class="dc dc-mid">D6</span>
+        </div>
+      </div>
+      <!-- M3 -->
+      <div class="skill-card sk-m3">
+        <div class="sk-header">
+          <div class="sk-badge" style="background:#FF6B00;">M3 — Con Marca</div>
+          <div class="sk-base-tag" style="background:#FFF3E0;color:#FF6B00;">Con Marca</div>
+        </div>
+        <div class="sk-row"><div class="sk-lbl">Q Registros</div><div class="sk-val orange">33,601</div></div>
+        <div class="sk-row"><div class="sk-lbl">HC Asesores</div><div class="sk-val orange">20</div></div>
+        <div class="sk-row"><div class="sk-lbl">Días de Gestión</div><div class="sk-val orange">16</div></div>
+        <div class="sk-row"><div class="sk-lbl">Base x Día</div><div class="sk-val orange">2,100</div></div>
+        <div class="sk-row"><div class="sk-lbl">Fecha Corte</div><div class="sk-val orange">18 Jul</div></div>
+        <div class="decil-chips">
+          <span class="dc dc-prio">D0</span><span class="dc dc-prio">D1</span>
+          <span class="dc dc-prio">D2</span><span class="dc dc-prio">D3</span>
+          <span class="dc dc-mid">D4</span><span class="dc dc-mid">D5</span>
+          <span class="dc dc-mid">D6</span>
+        </div>
+      </div>
+      <!-- M5 -->
+      <div class="skill-card sk-m5">
+        <div class="sk-header">
+          <div class="sk-badge" style="background:#27AE60;">M5 — Blindaje</div>
+          <div class="sk-base-tag" style="background:#ECFDF5;color:#065F46;">Blindaje</div>
+        </div>
+        <div class="sk-row"><div class="sk-lbl">Q Registros</div><div class="sk-val green">20,000</div></div>
+        <div class="sk-row"><div class="sk-lbl">HC Asesores</div><div class="sk-val green">16</div></div>
+        <div class="sk-row"><div class="sk-lbl">Días de Gestión</div><div class="sk-val green">15</div></div>
+        <div class="sk-row"><div class="sk-lbl">Base x Día</div><div class="sk-val green">1,333</div></div>
+        <div class="sk-row"><div class="sk-lbl">Fecha Corte</div><div class="sk-val green">21 Jul</div></div>
+        <div class="decil-chips">
+          <span class="dc dc-prio">D0</span><span class="dc dc-prio">D1</span>
+          <span class="dc dc-prio">D2</span>
+        </div>
+      </div>
+      <!-- OJT Sin Marca -->
+      <div class="skill-card sk-ojt">
+        <div class="sk-header">
+          <div class="sk-badge" style="background:#9B59B6;">OJT / Dom — Sin Marca</div>
+          <div class="sk-base-tag" style="background:#F3E8FF;color:#7C3AED;">Complementario</div>
+        </div>
+        <div class="sk-row"><div class="sk-lbl">Q Registros</div><div class="sk-val" style="color:#9B59B6;">40,625</div></div>
+        <div class="sk-row"><div class="sk-lbl">Uso</div><div class="sk-val" style="color:#9B59B6;font-size:11px;">OJT + Domingos</div></div>
+        <div class="sk-row"><div class="sk-lbl">Deciles</div><div class="sk-val" style="color:#9B59B6;">D7 + D8</div></div>
+        <div class="sk-row"><div class="sk-lbl">D7 Q</div><div class="sk-val" style="font-size:12px;">25,894</div></div>
+        <div class="sk-row"><div class="sk-lbl">D8 Q</div><div class="sk-val" style="font-size:12px;">14,731</div></div>
+        <div class="decil-chips">
+          <span class="dc dc-ojt">D7</span><span class="dc dc-ojt">D8</span>
+        </div>
+      </div>
+      <!-- OJT Con Marca -->
+      <div class="skill-card" style="border-top-color:#E67E22;">
+        <div class="sk-header">
+          <div class="sk-badge" style="background:#E67E22;">OJT / Dom — Con Marca</div>
+          <div class="sk-base-tag" style="background:#FFF3E0;color:#E67E22;">Complementario</div>
+        </div>
+        <div class="sk-row"><div class="sk-lbl">Q Registros</div><div class="sk-val" style="color:#E67E22;">5,666</div></div>
+        <div class="sk-row"><div class="sk-lbl">Uso</div><div class="sk-val" style="color:#E67E22;font-size:11px;">OJT + Domingos</div></div>
+        <div class="sk-row"><div class="sk-lbl">Deciles</div><div class="sk-val" style="color:#E67E22;">D7 + D8</div></div>
+        <div class="sk-row"><div class="sk-lbl">D7 Q</div><div class="sk-val" style="font-size:12px;">3,462</div></div>
+        <div class="sk-row"><div class="sk-lbl">D8 Q</div><div class="sk-val" style="font-size:12px;">2,204</div></div>
+        <div class="decil-chips">
+          <span class="dc dc-ojt">D7</span><span class="dc dc-ojt">D8</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MATRIZ DECIL-SKILL -->
+    <div class="tbl-card">
+      <div class="tbl-title">🔢 Matriz de Asignación Decil × Skill — Julio 2026 · Priorización estratégica</div>
+      <div class="matrix-wrap">
+        <table class="dec-matrix">
+          <thead>
+            <tr>
+              <th>Skill / Base</th>
+              <th>D0</th><th>D1</th><th>D2</th><th>D3</th>
+              <th>D4</th><th>D5</th><th>D6</th><th>D7</th><th>D8</th>
+              <th>HC</th><th>Días</th><th>Q Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>M1 · Sin Marca (Mejores deciles)</td><td><span class="dm-yes m1">✓</span></td><td><span class="dm-yes m1">✓</span></td><td><span class="dm-yes m1">✓</span></td><td><span class="dm-yes m1">✓</span></td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td><strong>56</strong></td><td>25</td><td><strong>158,538</strong></td></tr>
+            <tr><td>M2 · Sin Marca (Deciles medios)</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td><span class="dm-yes m2">✓</span></td><td><span class="dm-yes m2">✓</span></td><td><span class="dm-yes m2">✓</span></td><td class="dm-no">—</td><td class="dm-no">—</td><td><strong>23</strong></td><td>25</td><td><strong>119,570</strong></td></tr>
+            <tr style="background:#FFF8F0;"><td>OJT/Dom · Sin Marca</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td><span class="dm-yes ojt">✓</span></td><td><span class="dm-yes ojt">✓</span></td><td style="color:#9B59B6;">OJT</td><td>Dom.</td><td style="color:#9B59B6;"><strong>40,625</strong></td></tr>
+            <tr><td>M3 · Con Marca (D0–D6)</td><td><span class="dm-yes m3">✓</span></td><td><span class="dm-yes m3">✓</span></td><td><span class="dm-yes m3">✓</span></td><td><span class="dm-yes m3">✓</span></td><td><span class="dm-yes m3">✓</span></td><td><span class="dm-yes m3">✓</span></td><td><span class="dm-yes m3">✓</span></td><td class="dm-no">—</td><td class="dm-no">—</td><td><strong>20</strong></td><td>16</td><td><strong>33,601</strong></td></tr>
+            <tr style="background:#FFF8F0;"><td>OJT/Dom · Con Marca</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td><span class="dm-yes ojt">✓</span></td><td><span class="dm-yes ojt">✓</span></td><td style="color:#9B59B6;">OJT</td><td>Dom.</td><td style="color:#9B59B6;"><strong>5,666</strong></td></tr>
+            <tr><td>M5 · Blindaje (Solo D0–D2)</td><td><span class="dm-yes m5">✓</span></td><td><span class="dm-yes m5">✓</span></td><td><span class="dm-yes m5">✓</span></td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td class="dm-no">—</td><td><strong>16</strong></td><td>15</td><td><strong>20,000</strong></td></tr>
+            <tr class="tot"><td>TOTAL</td><td colspan="9" style="text-align:center;color:#6b7280;font-size:11px;">D0–D3 PRIO ALTA · D4–D6 PRIO MEDIA · D7–D8 OJT/DOMINGOS</td><td><strong>115</strong></td><td>—</td><td style="color:#FF6B00;font-weight:800;">378,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CALENDARIO GESTIÓN -->
+    <div class="cc span2" style="margin-bottom:18px;">
+      <div class="cc-title">📅 Cobertura de Días de Gestión por Tipo de Base — Julio 2026</div>
+      <div class="cc-sub">Distribución temporal · Lunes a Sábado · sin domingos · feriados 28/29 Jul excluidos · 23 Jul incluido como día laboral</div>
+      <div style="margin-top:4px;" id="cal-container">
+        <div class="cal-row">
+          <div class="cal-label">Sin Marca (M1+M2)</div>
+          <div class="cal-bar-wrap"><div class="cal-bar" style="width:100%;background:#003087;">25 días · Jul 1 → Jul 31</div></div>
+          <div style="width:70px;font-size:11px;font-weight:700;color:#003087;flex-shrink:0;text-align:right;">318,733 reg.</div>
+        </div>
+        <div style="font-size:10px;color:#9ca3af;margin:2px 0 12px 132px;">M1 (D0–D3, 56 HC): 6,342 reg/día · M2 (D4–D6, 23 HC): 4,783 reg/día · OJT/Dom (D7–D8): gestión complementaria</div>
+        <div class="cal-row">
+          <div class="cal-label">Con Marca (M3)</div>
+          <div class="cal-bar-wrap"><div class="cal-bar" style="width:64%;background:#FF6B00;">16 días · Jul 1 → Jul 18</div></div>
+          <div style="width:70px;font-size:11px;font-weight:700;color:#FF6B00;flex-shrink:0;text-align:right;">39,267 reg.</div>
+        </div>
+        <div style="font-size:10px;color:#9ca3af;margin:2px 0 12px 132px;">M3 (D0–D6, 20 HC): 2,100 reg/día · OJT/Dom (D7–D8): gestión complementaria · corte 18 de julio</div>
+        <div class="cal-row">
+          <div class="cal-label">Blindaje (M5)</div>
+          <div class="cal-bar-wrap"><div class="cal-bar" style="width:60%;background:#27AE60;">15 días · Jul 1 → Jul 21</div></div>
+          <div style="width:70px;font-size:11px;font-weight:700;color:#27AE60;flex-shrink:0;text-align:right;">20,000 reg.</div>
+        </div>
+        <div style="font-size:10px;color:#9ca3af;margin:2px 0 4px 132px;">M5 (D0–D2, 16 HC): 1,333 reg/día · solo deciles prime · corte 21 de julio</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="grid-2">
+      <div class="cc">
+        <div class="cc-title">Q Registros por Decil y Tipo de Base — Julio 2026</div>
+        <div class="cc-sub">Sin Marca · Con Marca · Blindaje · comparativo por segmento</div>
+        <div id="c-decil-tipos" style="height:290px;"></div>
+      </div>
+      <div class="cc">
+        <div class="cc-title">Ruta Julio — Ventas Diarias Proyectadas (Proyección Realista)</div>
+        <div class="cc-sub">SPD: 🟢≥12 · 🟡8–11.9 · 🔴&lt;8 · acumulado en eje derecho</div>
+        <div id="c-ruta" style="height:290px;"></div>
+      </div>
+    </div>
+
+    <!-- ESTRATEGIA DISCADO -->
+    <div class="sec-hdr" style="margin-top:4px;">
+      <div class="sec-title">🎯 Estrategia de Discado — Julio 2026</div>
+      <div class="sec-sub">Cronograma de gestión diaria · Plan A (barrido uniforme) vs Plan B (segmentación por plan tarifario)</div>
+    </div>
+    <div class="banner">💡 <span>Se proponen 2 planes de discado alternativos según el comportamiento de la jornada. El Plan B prioriza planes altos al inicio para maximizar rentabilidad, mientras el Plan A asegura cobertura uniforme de toda la base.</span></div>
+    <div class="strat-grid">
+      <div class="strat-c">
+        <div class="strat-hdr"><div class="plan-badge pa">PLAN A</div><div style="font-size:12.5px;font-weight:600;color:#003087;">Barrido Uniforme → Segmentación</div></div>
+        <div class="step"><div class="step-n sna">1</div><div><div class="step-t">09:00 – 13:00</div><div class="step-d">Barrido completo de toda la base de forma uniforme, maximizando el contacto inicial.</div></div></div>
+        <div class="step"><div class="step-n sna">2</div><div><div class="step-t">13:00 – 15:00</div><div class="step-d">Reducción a <strong>deciles 0–3</strong>, priorizando los segmentos de mayor efectividad.</div></div></div>
+        <div class="step"><div class="step-n sna">3</div><div><div class="step-t">14:00 – 15:00</div><div class="step-d"><strong>Segmentación geográfica</strong>: regiones con mayor contactabilidad en este tramo.</div></div></div>
+        <div class="step"><div class="step-n sna">4</div><div><div class="step-t">15:00 – 17:00</div><div class="step-d">Tratamiento y activación de <strong>base D-1</strong> para reforzar el contacto en tarde.</div></div></div>
+        <div class="step"><div class="step-n sna">5</div><div><div class="step-t">17:00 – 18:00</div><div class="step-d"><strong>Rediscado de cierre</strong> enfocado en deciles 0–3 para maximizar el final de jornada.</div></div></div>
+      </div>
+      <div class="strat-c">
+        <div class="strat-hdr"><div class="plan-badge pb">PLAN B</div><div style="font-size:12.5px;font-weight:600;color:#FF6B00;">Planes Altos → Bajos → Base Limpia</div></div>
+        <div class="step"><div class="step-n snb">1</div><div><div class="step-t">09:00 – 11:45</div><div class="step-d"><strong>Planes altos primero</strong>: Power 59.90 / 49.90 / 39.90 / Chip+ 32.90 para maximizar rentabilidad.</div></div></div>
+        <div class="step"><div class="step-n snb">2</div><div><div class="step-t">11:45 – 14:00</div><div class="step-d">Cambio a <strong>planes bajos</strong>: Chip 27.90 / 22.90 para sostener volumen y contactabilidad.</div></div></div>
+        <div class="step"><div class="step-n snb">3</div><div><div class="step-t">14:00 – 15:00</div><div class="step-d"><strong>Apertura total</strong> de todos los planes para maximizar cobertura en el tramo central.</div></div></div>
+        <div class="step"><div class="step-n snb">4</div><div><div class="step-t">15:00 – 16:00</div><div class="step-d"><strong>Filtro por recarga</strong>: clientes con recarga S/15–S/67, ofreciendo el plan según capacidad real.</div></div></div>
+        <div class="step"><div class="step-n snb">5</div><div><div class="step-t">16:00 – 18:00</div><div class="step-d"><strong>Rediscado base limpia</strong>: no contactos y con deuda, priorizando deciles 0–3 en el cierre.</div></div></div>
+      </div>
+    </div>
+
+    <!-- TABLA DISTRIBUCIÓN -->
+    <div class="tbl-card">
+      <div class="tbl-title">📋 Detalle de Distribución por Decil · Tipo de Base · Julio 2026</div>
+      <table>
+        <thead><tr>
+          <th>Decil</th>
+          <th>Q Sin Marca</th><th>Reg/Día SM</th><th>Skill SM</th>
+          <th>Q Con Marca</th><th>Reg/Día CM</th>
+          <th>Q Blindaje</th><th>Reg/Día BL</th>
+          <th>Total Decil</th><th>% Total</th>
+        </tr></thead>
+        <tbody id="tb-distr"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       HOJA 3: INFORME
+  ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-info">
+    <div class="inf-hero" style="margin-top:18px;">
+      <div class="inf-hero-title">Informe Ejecutivo — Netcall Group</div>
+      <div class="inf-hero-main">Estrategia de Base Julio 2026 · Campaña Migraciones Regular</div>
+      <div class="inf-hero-sub">Análisis de Comparativo de Bases e Informe de Distribución Estratégica · Elaborado para Gerencia de Ventas</div>
+      <div class="inf-hero-stats">
+        <div class="inf-stat"><div class="inf-stat-val">378,000</div><div class="inf-stat-lbl">Registros Totales Jul</div></div>
+        <div class="inf-stat"><div class="inf-stat-val orange">22,665</div><div class="inf-stat-lbl">Proy. Ventas Jul</div></div>
+        <div class="inf-stat"><div class="inf-stat-val green">115 HC</div><div class="inf-stat-lbl">Asesores Activos</div></div>
+        <div class="inf-stat"><div class="inf-stat-val" style="color:#F39C12;">5 Skills</div><div class="inf-stat-lbl">M1, M2, M3, M5, OJT</div></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- COLUMNA 1 -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="inf-section">
+          <div class="inf-sec-hdr">
+            <span class="inf-sec-ico">📊</span>
+            <div><div class="inf-sec-title">Análisis del Comparativo de Bases</div><div class="inf-sec-sub">Histórico Ene–Jul 2026 · Tendencias y variaciones</div></div>
+          </div>
+          <p class="inf-p">La base de <strong>Migraciones Regular</strong> se mantuvo estable en <strong>288,000 registros</strong> entre Enero y Mayo 2026, experimentando un <strong>incremento del 24.3% en Junio–Julio</strong> al incorporar 70,000 nuevos registros (deciles D7 y D8), elevando la base a 358,000.</p>
+          <p class="inf-p">La <strong>efectividad general muestra tendencia decreciente</strong> consistente con el crecimiento de deciles de menor conversión: 7.71% en Enero → 5.25% en Junio. Para Julio, la proyección mejora levemente a <strong>5.50%</strong> producto de la priorización estratégica D0–D3 en los skills de mayor headcount.</p>
+          <div class="inf-insight">🔑 Los deciles D0 y D1 concentran el <strong>21.9% de la base</strong> pero generan el <strong>40.6% de las ventas proyectadas</strong>. Su priorización en M1 (56 HC) es el principal driver de conversión del mes.</div>
+          <div class="inf-kpi-mini">
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val">D0</div><div class="inf-kpi-m-lbl">Efec. 9.70%</div></div>
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val">D1</div><div class="inf-kpi-m-lbl">Efec. 10.30%</div></div>
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val orange">D4</div><div class="inf-kpi-m-lbl">+9,568 reg. Jul</div></div>
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val" style="color:#E74C3C;">D6</div><div class="inf-kpi-m-lbl">-19,010 reg. Jul</div></div>
+          </div>
+          <p class="inf-p" style="margin-top:6px;">El <strong>D6 presenta la mayor variación negativa</strong> con -19,010 registros vs Junio, lo que reduce el volumen en el segmento de efectividad más baja (2.37%). Los <strong>deciles D4 y D5 crecen en +9,568 y +9,139 registros</strong> respectivamente, aumentando el volumen de deciles medios que requieren mayor esfuerzo de discado para alcanzar sus metas.</p>
+        </div>
+
+        <div class="inf-section">
+          <div class="inf-sec-hdr">
+            <span class="inf-sec-ico">📋</span>
+            <div><div class="inf-sec-title">Análisis por Plan Tarifario</div><div class="inf-sec-sub">Composición de base y efectividad por segmento de tarifa</div></div>
+          </div>
+          <p class="inf-p">El <strong>Chip 22.90 REV</strong> domina la base de Julio con 196,086 registros (54.8%), consolidando su crecimiento sostenido desde el 42.3% de Enero. Pese a su mayor volumen, presenta la <strong>efectividad más baja proyectada (4.81%)</strong>, por lo que la estrategia Plan B lo gestiona en el tramo intermedio (11:45–14:00) para sostener volumen sin sacrificar la rentabilidad del inicio de jornada.</p>
+          <p class="inf-p">Los <strong>planes Power</strong> (39.90, 49.90, 59.90) representan el 21.4% de la base con efectividades superiores al 7.4%. La estrategia Plan B los prioriza en el tramo 09:00–11:45 cuando la contactabilidad es máxima. El <strong>Power 59.90</strong> proyecta la mayor efectividad (8.20%) y es el primer plan a gestionar en Plan B.</p>
+          <div class="inf-insight orange">⚠️ El <strong>Chip 22.90 REV</strong> representa 54.8% del volumen pero aporta solo 7,843 ventas proyectadas (39.8% del total). Optimizar su discado con filtros de decil D0–D3 podría mejorar su ratio de conversión.</div>
+        </div>
+      </div>
+
+      <!-- COLUMNA 2 -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="inf-section">
+          <div class="inf-sec-hdr">
+            <span class="inf-sec-ico">📦</span>
+            <div><div class="inf-sec-title">Análisis de la Estrategia de Distribución</div><div class="inf-sec-sub">Asignación de base por skill, decil y período de gestión</div></div>
+          </div>
+          <p class="inf-p">La distribución de base está <strong>diseñada para maximizar conversión priorizando D0–D3</strong> en los skills de mayor headcount y más días de gestión. El 49.7% del total de Sin Marca (158,538 reg.) está asignado al Skill M1 con los mejores 56 asesores durante todo el mes.</p>
+          <div class="proy-breakdown">
+            <div style="font-size:10.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Distribución de HC por Skill</div>
+            <div class="proy-row">
+              <div class="proy-label">M1 · Sin Marca</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:49%;background:#003087;">56 HC · 49%</div></div>
+              <div class="proy-val">158K reg.</div>
+            </div>
+            <div class="proy-row">
+              <div class="proy-label">M2 · Sin Marca</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:20%;background:#1a6abf;">23 HC</div></div>
+              <div class="proy-val">120K reg.</div>
+            </div>
+            <div class="proy-row">
+              <div class="proy-label">M3 · Con Marca</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:17%;background:#FF6B00;">20 HC</div></div>
+              <div class="proy-val">34K reg.</div>
+            </div>
+            <div class="proy-row">
+              <div class="proy-label">M5 · Blindaje</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:14%;background:#27AE60;">16 HC</div></div>
+              <div class="proy-val">20K reg.</div>
+            </div>
+          </div>
+          <div class="inf-insight green">✅ La concentración del 48.7% del HC (56 asesores M1) en los deciles de <strong>mayor efectividad (D0–D3)</strong> garantiza la optimización de la conversión y maximiza las ventas proyectadas de 19,690 unidades en Migraciones.</div>
+          <p class="inf-p">La <strong>Base Blindaje</strong> se gestiona con 16 HC en solo 15 días (hasta el 21 de julio), concentrada en los deciles D0–D2 que presentan efectividades históricas superiores al 11%, proyectando 2,975 ventas adicionales con una efectividad del 14.87% — casi 3 veces superior a la de Migraciones.</p>
+          <div class="inf-insight">ℹ️ Los <strong>Deciles D7 y D8</strong> (46,291 registros en total) se destinan a gestión OJT y domingos, priorizando la productividad de los asesores ya calificados en los segmentos de mayor retorno durante días laborales.</div>
+        </div>
+
+        <div class="inf-section">
+          <div class="inf-sec-hdr">
+            <span class="inf-sec-ico">🎯</span>
+            <div><div class="inf-sec-title">Proyecciones y Cierre Esperado — Julio 2026</div><div class="inf-sec-sub">Estimaciones de venta por tipo de base</div></div>
+          </div>
+          <div class="proy-breakdown">
+            <div style="font-size:10.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Proyección de Ventas por Tipo de Base</div>
+            <div class="proy-row">
+              <div class="proy-label">Migra Regular</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:87%;background:#003087;">19,690 · 87% del total</div></div>
+              <div class="proy-val">19,690</div>
+            </div>
+            <div class="proy-row">
+              <div class="proy-label">Blindaje</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:13%;background:#27AE60;">2,975</div></div>
+              <div class="proy-val">2,975</div>
+            </div>
+            <div class="proy-row">
+              <div class="proy-label" style="font-weight:700;">TOTAL</div>
+              <div class="proy-bar-wrap"><div class="proy-bar" style="width:100%;background:#FF6B00;">22,665 ventas totales proyectadas</div></div>
+              <div class="proy-val" style="color:#FF6B00;font-weight:800;">22,665</div>
+            </div>
+          </div>
+          <div class="inf-kpi-mini">
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val orange">22,665</div><div class="inf-kpi-m-lbl">Total Proyectado</div></div>
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val green">14.87%</div><div class="inf-kpi-m-lbl">Efec. Blindaje</div></div>
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val">5.50%</div><div class="inf-kpi-m-lbl">Efec. Migra</div></div>
+            <div class="inf-kpi-m"><div class="inf-kpi-m-val">9.47</div><div class="inf-kpi-m-lbl">SPD Jul</div></div>
+          </div>
+        </div>
+
+        <div class="inf-section">
+          <div class="inf-sec-hdr">
+            <span class="inf-sec-ico">💡</span>
+            <div><div class="inf-sec-title">Recomendaciones para Gerencia</div><div class="inf-sec-sub">Puntos de atención y acciones sugeridas</div></div>
+          </div>
+          <div class="rec-grid">
+            <div class="rec-card"><div class="rec-ico">🏆</div><div><div class="rec-title">Sostener priorización D0–D1</div><div class="rec-txt">Garantizar que M1 (56 HC) trabaje exclusivamente D0–D3 sin desvíos hacia deciles medios para proteger la efectividad proyectada.</div></div></div>
+            <div class="rec-card"><div class="rec-ico">⚡</div><div><div class="rec-title">Aplicar Plan B en inicio</div><div class="rec-txt">Priorizar planes Power en la apertura de jornada para capturar el tramo de mayor contactabilidad con los planes de mayor ticket.</div></div></div>
+            <div class="rec-card"><div class="rec-ico">📈</div><div><div class="rec-title">Monitorear D4–D5</div><div class="rec-txt">El crecimiento de D4 (+9,568) y D5 (+9,139) requiere seguimiento especial: mayor volumen con efectividad baja (~4–5%).</div></div></div>
+            <div class="rec-card"><div class="rec-ico">🛡️</div><div><div class="rec-title">Optimizar Blindaje M5</div><div class="rec-txt">Con 14.87% de efectividad, el Blindaje es el producto más rentable. Evaluar extender días de gestión o aumentar HC en M5.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-info -->
+</div><!-- /main -->
+
+<script>
+// ═══════════════════════ DATA ═══════════════════════
+const MIGRA = [
+  {d:'D0',qE:27398,efE:.1175,qF:16596,efF:.1020,qMr:19999,efMr:.1249,qA:18156,efA:.1077,qMy:22567,efMy:.0871,qJn:20492,efJn:.0936,qJl:19668,dif:-824,pE:.097,pV:1908},
+  {d:'D1',qE:50803,efE:.1372,qF:52815,efF:.1211,qMr:53558,efMr:.1358,qA:61156,efA:.1076,qMy:59333,efMy:.1028,qJn:60379,efJn:.1004,qJl:59296,dif:-1083,pE:.103,pV:6107},
+  {d:'D2',qE:42035,efE:.1014,qF:46879,efF:.0830,qMr:43641,efMr:.0949,qA:43705,efA:.0803,qMy:44857,efMy:.0706,qJn:45780,efJn:.0645,qJl:45903,dif:123,pE:.0685,pV:3143},
+  {d:'D3',qE:39006,efE:.0784,qF:47163,efF:.0682,qMr:48090,efMr:.0723,qA:49731,efA:.0697,qMy:52916,efMy:.0660,qJn:51302,efJn:.0594,qJl:53389,dif:2087,pE:.062,pV:3310},
+  {d:'D4',qE:40188,efE:.0361,qF:40341,efF:.0298,qMr:48937,efMr:.0480,qA:41489,efA:.0367,qMy:44361,efMy:.0386,qJn:43590,efJn:.0485,qJl:53158,dif:9568,pE:.0496,pV:2638},
+  {d:'D5',qE:38697,efE:.0303,qF:36691,efF:.0239,qMr:44189,efMr:.0388,qA:38715,efA:.0315,qMy:42698,efMy:.0314,qJn:44257,efJn:.0244,qJl:53396,dif:9139,pE:.027,pV:1444},
+  {d:'D6',qE:34756,efE:.0208,qF:33127,efF:.0205,qMr:29586,efMr:.0299,qA:35048,efA:.0236,qMy:21268,efMy:.0257,qJn:45909,efJn:.0218,qJl:26899,dif:-19010,pE:.0237,pV:638},
+  {d:'D7',qE:null,efE:null,qF:null,efF:null,qMr:null,efMr:null,qA:null,efA:null,qMy:0,efMy:null,qJn:29356,efJn:.0145,qJl:29356,dif:0,pE:.0145,pV:425},
+  {d:'D8',qE:null,efE:null,qF:null,efF:null,qMr:null,efMr:null,qA:null,efA:null,qMy:0,efMy:null,qJn:16935,efJn:.0114,qJl:16935,dif:0,pE:.0114,pV:192},
+  {d:'TOTAL',qE:272883,efE:.0771,qF:273612,efF:.0655,qMr:288000,efMr:.0775,qA:288000,efA:.0662,qMy:288000,efMy:.0636,qJn:358000,efJn:.0525,qJl:358000,dif:0,pE:.055,pV:19690}
+];
+const BLIND=[
+  {d:'D0',qE:2558,efE:.1898,qF:1303,efF:.1817,qMr:1531,efMr:.1870,qA:1697,efA:.1665,qMy:1844,efMy:.1752,qJn:1822,efJn:.2029,qJl:1749,pE:.1839,pV:335},
+  {d:'D1',qE:9698,efE:.1841,qF:9685,efF:.1732,qMr:10156,efMr:.1555,qA:9833,efA:.1569,qMy:9679,efMy:.1833,qJn:10107,efJn:.1797,qJl:9925,pE:.1721,pV:1740},
+  {d:'D2',qE:7744,efE:.1326,qF:8400,efF:.0992,qMr:8313,efMr:.0999,qA:8470,efA:.0975,qMy:8477,efMy:.1288,qJn:8071,efJn:.1240,qJl:8326,pE:.1137,pV:917},
+  {d:'TOTAL',qE:20000,efE:.1648,qF:19388,efF:.1417,qMr:20000,efMr:.1347,qA:20000,efA:.1325,qMy:20000,efMy:.1594,qJn:20000,efJn:.1593,qJl:20000,pE:.1487,pV:2975}
+];
+const PLAN=[
+  {p:'Chip 22.90 REV',qE:115438,pE:.423,qF:111637,pF:.408,qMr:125862,pMr:.437,qA:146520,pA:.509,qMy:143952,pMy:.500,qJn:178850,pJn:.500,qJl:196086,pJl:.548,pEf:.0481,pV:7843},
+  {p:'Chip 27.90 REV',qE:66363,pE:.243,qF:69289,pF:.253,qMr:68906,pMr:.239,qA:65657,pA:.228,qMy:67305,pMy:.234,qJn:75043,pJn:.210,qJl:76296,pJl:.213,pEf:.057,pV:4349},
+  {p:'Chip+ 32.90',qE:8829,pE:.032,qF:9035,pF:.033,qMr:9000,pMr:.031,qA:8213,pA:.029,qMy:8658,pMy:.030,qJn:9817,pJn:.027,qJl:9009,pJl:.025,pEf:.0645,pV:581},
+  {p:'Power 39.90',qE:42327,pE:.155,qF:41361,pF:.151,qMr:41143,pMr:.143,qA:37189,pA:.129,qMy:37548,pMy:.130,qJn:45047,pJn:.126,qJl:38911,pJl:.109,pEf:.074,pV:2880},
+  {p:'Power 49.90',qE:22475,pE:.082,qF:21803,pF:.080,qMr:22232,pMr:.077,qA:17672,pA:.061,qMy:17586,pMy:.061,qJn:23145,pJn:.065,qJl:19319,pJl:.054,pEf:.0776,pV:1500},
+  {p:'Power 59.90',qE:17451,pE:.064,qF:20487,pF:.075,qMr:20857,pMr:.072,qA:12749,pA:.044,qMy:12951,pMy:.045,qJn:26098,pJn:.073,qJl:18379,pJl:.051,pEf:.082,pV:1508},
+  {p:'TOTAL',qE:272883,pE:1,qF:273612,pF:1,qMr:288000,pMr:1,qA:288000,pA:1,qMy:288000,pMy:1,qJn:358000,pJn:1,qJl:358000,pJl:1,pEf:.055,pV:19690}
+];
+const SM=[{d:'D0',q:17032,bxd:681},{d:'D1',q:52553,bxd:2102},{d:'D2',q:40989,bxd:1640},{d:'D3',q:47964,bxd:1919},{d:'D4',q:47941,bxd:1918},{d:'D5',q:47735,bxd:1909},{d:'D6',q:23894,bxd:956},{d:'D7',q:25894,bxd:null},{d:'D8',q:14731,bxd:null}];
+const CM=[{d:'D0',q:2636,bxd:165},{d:'D1',q:6743,bxd:421},{d:'D2',q:4914,bxd:307},{d:'D3',q:5425,bxd:339},{d:'D4',q:5217,bxd:326},{d:'D5',q:5661,bxd:354},{d:'D6',q:3005,bxd:188},{d:'D7',q:3462,bxd:null},{d:'D8',q:2204,bxd:null}];
+const BL=[{d:'D0',q:1749,bxd:1333},{d:'D1',q:9925,bxd:null},{d:'D2',q:8326,bxd:null}];
+const RUTA=[
+  {dia:'01/Jul',vent:1047,spd:11.24},{dia:'02/Jul',vent:1110,spd:11.91},
+  {dia:'03/Jul',vent:1085,spd:11.77},{dia:'04/Jul',vent:1102,spd:11.55},
+  {dia:'06/Jul',vent:982, spd:10.72},{dia:'08/Jul',vent:1000,spd:11.17},
+  {dia:'09/Jul',vent:981, spd:11.12},{dia:'10/Jul',vent:970, spd:10.88},
+  {dia:'11/Jul',vent:1028,spd:11.52},{dia:'13/Jul',vent:922, spd:10.85},
+  {dia:'15/Jul',vent:943, spd:10.59},{dia:'16/Jul',vent:1022,spd:9.80},
+  {dia:'17/Jul',vent:943, spd:9.21}, {dia:'18/Jul',vent:915, spd:9.14},
+  {dia:'20/Jul',vent:752, spd:7.65}, {dia:'22/Jul',vent:770, spd:8.07},
+  {dia:'23/Jul',vent:895, spd:9.01}, {dia:'24/Jul',vent:874, spd:8.66},
+  {dia:'25/Jul',vent:1100,spd:10.86},{dia:'27/Jul',vent:1050,spd:10.37},
+  {dia:'29/Jul',vent:900, spd:12.09},{dia:'31/Jul',vent:800, spd:7.84}
+];
+
+// ═══════════════════════ NAV ═══════════════════════
+const TT={
+  comp:['Comparativo Bases — Migraciones Regular','Análisis histórico Ene–Jul 2026 · Efectividad por decil y plan · Proyección total: 19,690 (Migra) + 2,975 (Blindaje) = 22,665 ventas'],
+  estr:['Estrategia y Distribución de Base — Julio 2026','Distribución por skill y decil · Calendário de gestión · Estrategia de discado Plan A / Plan B'],
+  info:['Informe Ejecutivo — Estrategia de Base Julio 2026','Análisis integral: Comparativo de Bases + Distribución Estratégica · Elaborado para Gerencia de Ventas']
+};
+function goPage(id){
+  ['comp','estr','info'].forEach(p=>{
+    document.getElementById('page-'+p).classList.toggle('active',p===id);
+    document.getElementById('nav-'+p).classList.toggle('active',p===id);
+  });
+  document.getElementById('pg-title').textContent=TT[id][0];
+  document.getElementById('pg-sub').textContent=TT[id][1];
+}
+
+// ═══════════════════════ HELPERS ═══════════════════════
+const N='#003087',OR='#FF6B00',GR='#27AE60',YL='#F39C12',RD='#E74C3C',LB='#1a6abf',TL='#1ABC9C',PU='#9B59B6';
+const cfg={responsive:true,displayModeBar:false};
+const BLY={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{family:'Segoe UI,system-ui',size:11,color:'#374151'}};
+function semE(v){if(v===null||v===undefined)return '<span class="bg bg-n">—</span>';if(v>=.077)return '<span class="bg bg-g">'+(v*100).toFixed(1)+'%</span>';if(v>=.060)return '<span class="bg bg-y">'+(v*100).toFixed(1)+'%</span>';return '<span class="bg bg-r">'+(v*100).toFixed(1)+'%</span>';}
+function fq(v){return(v===null||v===undefined)?'—':v===0?'<span style="color:#9ca3af">0</span>':v.toLocaleString('es-PE');}
+function fp(v){return v===null?'—':(v*100).toFixed(1)+'%';}
+function difBadge(v){if(!v)return'—';if(v>0)return'<span class="bg bg-g">+'+v.toLocaleString('es-PE')+'</span>';if(v<0)return'<span class="bg bg-r">'+v.toLocaleString('es-PE')+'</span>';return'<span class="bg bg-n">0</span>';}
+
+// ═══════════════════════ TABLES ═══════════════════════
+function buildTbMigra(){
+  let h='';
+  MIGRA.forEach(r=>{
+    const tot=r.d==='TOTAL';
+    h+=`<tr${tot?' class="tot"':''}>
+      <td>${r.d}</td>
+      <td>${fq(r.qE)}</td><td>${semE(r.efE)}</td>
+      <td>${fq(r.qF)}</td><td>${semE(r.efF)}</td>
+      <td>${fq(r.qMr)}</td><td>${semE(r.efMr)}</td>
+      <td>${fq(r.qA)}</td><td>${semE(r.efA)}</td>
+      <td>${fq(r.qMy)}</td><td>${semE(r.efMy)}</td>
+      <td>${fq(r.qJn)}</td><td>${semE(r.efJn)}</td>
+      <td>${fq(r.qJl)}</td><td>${difBadge(r.dif)}</td><td>${semE(r.pE)}</td>
+      <td style="font-weight:800;color:#FF6B00;">${fq(r.pV)}</td></tr>`;
+  });
+  document.getElementById('tb-dec-migra').innerHTML=h;
+}
+function buildTbBlind(){
+  let h='';
+  BLIND.forEach(r=>{
+    const tot=r.d==='TOTAL';
+    h+=`<tr${tot?' class="tot"':''}>
+      <td>${r.d}</td>
+      <td>${fq(r.qE)}</td><td>${semE(r.efE)}</td>
+      <td>${fq(r.qF)}</td><td>${semE(r.efF)}</td>
+      <td>${fq(r.qMr)}</td><td>${semE(r.efMr)}</td>
+      <td>${fq(r.qA)}</td><td>${semE(r.efA)}</td>
+      <td>${fq(r.qMy)}</td><td>${semE(r.efMy)}</td>
+      <td>${fq(r.qJn)}</td><td>${semE(r.efJn)}</td>
+      <td>${fq(r.qJl)}</td><td>${semE(r.pE)}</td>
+      <td style="font-weight:800;color:#1ABC9C;">${fq(r.pV)}</td></tr>`;
+  });
+  document.getElementById('tb-dec-blind').innerHTML=h;
+}
+function buildTbPlan(){
+  let h='';
+  PLAN.forEach(r=>{
+    const tot=r.p==='TOTAL';
+    h+=`<tr${tot?' class="tot"':''}>
+      <td>${r.p}</td>
+      <td>${fq(r.qE)}</td><td>${fp(r.pE)}</td>
+      <td>${fq(r.qF)}</td><td>${fp(r.pF)}</td>
+      <td>${fq(r.qMr)}</td><td>${fp(r.pMr)}</td>
+      <td>${fq(r.qA)}</td><td>${fp(r.pA)}</td>
+      <td>${fq(r.qMy)}</td><td>${fp(r.pMy)}</td>
+      <td>${fq(r.qJn)}</td><td>${fp(r.pJn)}</td>
+      <td>${fq(r.qJl)}</td><td>${fp(r.pJl)}</td>
+      <td>${semE(r.pEf)}</td>
+      <td style="font-weight:800;color:#FF6B00;">${fq(r.pV)}</td></tr>`;
+  });
+  document.getElementById('tb-plan').innerHTML=h;
+}
+function buildTbDistr(){
+  const decils=['D0','D1','D2','D3','D4','D5','D6','D7','D8'];
+  let h='',tSM=0,tCM=0,tBL=0,tTT=0;
+  decils.forEach(d=>{
+    const sm=SM.find(x=>x.d===d),cm=CM.find(x=>x.d===d),bl=BL.find(x=>x.d===d);
+    const tot=(sm?sm.q:0)+(cm?cm.q:0)+(bl?bl.q:0);
+    tSM+=(sm?sm.q:0);tCM+=(cm?cm.q:0);tBL+=(bl?bl.q:0);tTT+=tot;
+    const skill=d==='D0'||d==='D1'||d==='D2'||d==='D3'?'<span class="bg bg-b">M1</span>':d==='D4'||d==='D5'||d==='D6'?'<span class="bg bg-n">M2</span>':'<span style="color:#9B59B6;font-size:10px;font-weight:700;">OJT/Dom</span>';
+    h+=`<tr>
+      <td>${d}</td>
+      <td>${sm?sm.q.toLocaleString('es-PE'):'—'}</td>
+      <td style="color:#6b7280;">${sm&&sm.bxd?sm.bxd.toLocaleString('es-PE'):'—'}</td>
+      <td>${skill}</td>
+      <td>${cm?cm.q.toLocaleString('es-PE'):'—'}</td>
+      <td style="color:#6b7280;">${cm&&cm.bxd?cm.bxd.toLocaleString('es-PE'):'—'}</td>
+      <td>${bl?bl.q.toLocaleString('es-PE'):'—'}</td>
+      <td style="color:#6b7280;">${bl&&bl.bxd?bl.bxd.toLocaleString('es-PE'):'—'}</td>
+      <td style="font-weight:700;">${tot.toLocaleString('es-PE')}</td>
+      <td>${(tot/378000*100).toFixed(1)}%</td></tr>`;
+  });
+  h+=`<tr class="tot"><td>TOTAL</td><td>${tSM.toLocaleString('es-PE')}</td><td>12,749</td><td>—</td><td>${tCM.toLocaleString('es-PE')}</td><td>2,454</td><td>${tBL.toLocaleString('es-PE')}</td><td>1,333</td><td style="color:#FF6B00;font-weight:800;">${tTT.toLocaleString('es-PE')}</td><td>100%</td></tr>`;
+  document.getElementById('tb-distr').innerHTML=h;
+}
+
+// ═══════════════════════ CHARTS ═══════════════════════
+function initCharts(){
+
+  /* ── C1: Evolución histórica — barras apiladas con totales ── */
+  const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul'];
+  const mBase=[272883,273612,288000,288000,288000,358000,358000];
+  const mBlin=[20000,19388,20000,20000,20000,20000,20000];
+  const mTot=mBase.map((v,i)=>v+mBlin[i]);
+  const el1=document.getElementById('c-evol');el1.innerHTML='';
+  Plotly.newPlot(el1,[
+    {x:meses,y:mBase,name:'Migra Regular',type:'bar',
+     marker:{color:N,line:{color:'rgba(255,255,255,0.15)',width:1}},
+     text:mBase.map(v=>(v/1000).toFixed(0)+'K'),
+     textposition:'inside',textfont:{color:'#fff',size:13}},
+    {x:meses,y:mBlin,name:'Blindaje',type:'bar',
+     marker:{color:TL,line:{color:'rgba(255,255,255,0.15)',width:1}},
+     text:mBlin.map(v=>(v/1000).toFixed(0)+'K'),
+     textposition:'inside',textfont:{color:'#fff',size:12}}
+  ],{...BLY,
+    barmode:'stack',
+    bargap:0.28,
+    xaxis:{title:'',gridcolor:'#f0f4f8',tickfont:{size:13}},
+    yaxis:{gridcolor:'#f0f4f8',tickformat:',.0f',tickfont:{size:12}},
+    legend:{orientation:'h',y:-0.18,x:.5,xanchor:'center',font:{size:13}},
+    annotations:meses.map((m,i)=>({
+      x:m,y:mTot[i],
+      text:'<b>'+(mTot[i]/1000).toFixed(0)+'K</b>',
+      showarrow:false,yanchor:'bottom',yshift:6,
+      font:{size:13,color:'#003087'}
+    })),
+    margin:{t:30,r:12,b:55,l:62}
+  },cfg);
+
+  /* ── C2: Efectividad por decil — barras horizontales con semáforo ── */
+  const dd=MIGRA.filter(r=>r.d!=='TOTAL'&&r.pE!==null);
+  const ec=dd.map(r=>r.pE>=.077?GR:r.pE>=.060?YL:RD);
+  const el2=document.getElementById('c-efec-decil');el2.innerHTML='';
+  Plotly.newPlot(el2,[{
+    y:dd.map(r=>r.d),
+    x:dd.map(r=>+(r.pE*100).toFixed(2)),
+    type:'bar',orientation:'h',
+    marker:{color:ec,line:{color:'rgba(255,255,255,0.2)',width:1}},
+    text:dd.map(r=>'<b>'+(r.pE*100).toFixed(1)+'%</b>'),
+    textposition:'outside',
+    textfont:{size:13,color:'#374151'},
+    hovertemplate:'<b>%{y}</b>  Efect proy: %{x:.1f}%<extra></extra>'
+  }],{...BLY,
+    showlegend:false,
+    bargap:0.28,
+    xaxis:{gridcolor:'#f0f4f8',ticksuffix:'%',tickfont:{size:12},range:[0,13.5]},
+    yaxis:{autorange:'reversed',tickfont:{size:14}},
+    margin:{t:12,r:65,b:32,l:42},
+    shapes:[
+      {type:'line',x0:7.7,x1:7.7,y0:-.5,y1:dd.length-.5,line:{color:GR,dash:'dot',width:2}},
+      {type:'line',x0:6.0,x1:6.0,y0:-.5,y1:dd.length-.5,line:{color:YL,dash:'dot',width:2}}
+    ],
+    annotations:[
+      {x:7.7,y:-.85,text:'Meta 7.7%',showarrow:false,font:{size:11,color:GR},xanchor:'center'},
+      {x:6.0,y:-.85,text:'6.0%',showarrow:false,font:{size:11,color:YL},xanchor:'center'}
+    ]
+  },cfg);
+
+  /* ── C3: Donut planes — con leyenda lateral y % visible ── */
+  const pl=PLAN.filter(p=>p.p!=='TOTAL');
+  const el3=document.getElementById('c-plan-donut');el3.innerHTML='';
+  Plotly.newPlot(el3,[{
+    values:pl.map(p=>p.qJl),
+    labels:pl.map(p=>p.p),
+    type:'pie',hole:.46,
+    marker:{colors:[N,LB,'#4CBBCE',TL,OR,'#E91E63'],
+            line:{color:'#fff',width:2}},
+    textinfo:'percent',
+    textposition:'inside',
+    textfont:{size:13,color:'#fff'},
+    insidetextorientation:'radial',
+    hovertemplate:'<b>%{label}</b><br>Q Registros: %{value:,}<br>Participación: %{percent}<extra></extra>'
+  }],{...BLY,
+    legend:{orientation:'v',x:1.02,y:.5,xanchor:'left',yanchor:'middle',
+            font:{size:12},bgcolor:'rgba(0,0,0,0)'},
+    margin:{t:12,r:145,b:12,l:12},
+    annotations:[{
+      text:'<b>358K</b><br>Registros',
+      x:.5,y:.5,showarrow:false,
+      font:{size:14,color:N}
+    }]
+  },cfg);
+
+  /* ── C4: Efectividad por plan — barras horizontales con umbrales ── */
+  const pn=['Chip 22.90','Chip 27.90','Chip+ 32.90','Power 39.90','Power 49.90','Power 59.90'];
+  const pe=[4.81,5.70,6.45,7.40,7.76,8.20];
+  const el4=document.getElementById('c-efec-plan');el4.innerHTML='';
+  Plotly.newPlot(el4,[{
+    y:pn,x:pe,type:'bar',orientation:'h',
+    marker:{color:pe.map(v=>v>=7.7?GR:v>=6.0?YL:RD),
+            line:{color:'rgba(255,255,255,0.2)',width:1}},
+    text:pe.map(v=>'<b>'+v.toFixed(2)+'%</b>'),
+    textposition:'outside',
+    textfont:{size:13,color:'#374151'},
+    hovertemplate:'<b>%{y}</b><br>Efect proyectada: %{x:.2f}%<extra></extra>'
+  }],{...BLY,
+    showlegend:false,
+    bargap:0.28,
+    xaxis:{gridcolor:'#f0f4f8',ticksuffix:'%',tickfont:{size:12},range:[0,10.8]},
+    yaxis:{autorange:'reversed',tickfont:{size:13}},
+    margin:{t:12,r:65,b:32,l:92},
+    shapes:[
+      {type:'line',x0:7.7,x1:7.7,y0:-.5,y1:5.5,line:{color:GR,dash:'dot',width:2}},
+      {type:'line',x0:6.0,x1:6.0,y0:-.5,y1:5.5,line:{color:YL,dash:'dot',width:2}}
+    ],
+    annotations:[
+      {x:7.7,y:-.85,text:'Meta 7.7%',showarrow:false,font:{size:11,color:GR},xanchor:'center'},
+      {x:6.0,y:-.85,text:'6.0%',showarrow:false,font:{size:11,color:YL},xanchor:'center'}
+    ]
+  },cfg);
+
+  /* ── C5: Tendencia histórica — líneas gruesas con etiquetas en cada punto ── */
+  const mh=['Ene','Feb','Mar','Abr','May','Jun'];
+  const hd=[
+    {d:'D0',v:[.1175,.1020,.1249,.1077,.0871,.0936],c:GR},
+    {d:'D1',v:[.1372,.1211,.1358,.1076,.1028,.1004],c:N},
+    {d:'D2',v:[.1014,.0830,.0949,.0803,.0706,.0645],c:LB},
+    {d:'D3',v:[.0784,.0682,.0723,.0697,.0660,.0594],c:TL},
+    {d:'D4',v:[.0361,.0298,.0480,.0367,.0386,.0485],c:YL}
+  ];
+  const el5=document.getElementById('c-efec-hist');el5.innerHTML='';
+  Plotly.newPlot(el5,
+    hd.map(h=>({
+      x:mh,
+      y:h.v.map(v=>+(v*100).toFixed(2)),
+      name:h.d,
+      mode:'lines+markers+text',
+      line:{color:h.c,width:3},
+      marker:{color:h.c,size:9,line:{color:'#fff',width:2}},
+      text:h.v.map(v=>(v*100).toFixed(1)+'%'),
+      textposition:'top center',
+      textfont:{size:10,color:h.c},
+      hovertemplate:'<b>%{x}</b>  %{y:.1f}%<extra>'+h.d+'</extra>'
+    })),
+  {...BLY,
+    xaxis:{gridcolor:'#f0f4f8',tickfont:{size:13}},
+    yaxis:{gridcolor:'#f0f4f8',ticksuffix:'%',tickfont:{size:12},range:[0,18]},
+    legend:{orientation:'h',y:1.14,x:.5,xanchor:'center',font:{size:13}},
+    margin:{t:34,r:14,b:38,l:50},
+    shapes:[
+      {type:'line',x0:-.5,x1:5.5,y0:7.7,y1:7.7,line:{color:GR,dash:'dot',width:1.5}},
+      {type:'line',x0:-.5,x1:5.5,y0:6.0,y1:6.0,line:{color:YL,dash:'dot',width:1.5}}
+    ],
+    annotations:[
+      {x:5.5,y:7.7,text:' 7.7%',showarrow:false,xanchor:'left',font:{size:11,color:GR}},
+      {x:5.5,y:6.0,text:' 6.0%',showarrow:false,xanchor:'left',font:{size:11,color:YL}}
+    ]
+  },cfg);
+
+  /* ── C6: Decil por tipo de base — barras agrupadas con etiquetas ── */
+  const decls=['D0','D1','D2','D3','D4','D5','D6','D7','D8'];
+  const smQ=SM.map(d=>d.q);
+  const cmQ=decls.map(d=>{const r=CM.find(x=>x.d===d);return r?r.q:0;});
+  const blQ=decls.map(d=>{const r=BL.find(x=>x.d===d);return r?r.q:0;});
+  const el6=document.getElementById('c-decil-tipos');el6.innerHTML='';
+  Plotly.newPlot(el6,[
+    {x:decls,y:smQ,name:'Sin Marca',type:'bar',
+     marker:{color:N},
+     text:smQ.map(v=>(v/1000).toFixed(1)+'K'),
+     textposition:'outside',textfont:{size:11,color:N}},
+    {x:decls,y:cmQ,name:'Con Marca',type:'bar',
+     marker:{color:OR},
+     text:cmQ.map(v=>v>0?(v/1000).toFixed(1)+'K':''),
+     textposition:'outside',textfont:{size:11,color:OR}},
+    {x:decls,y:blQ,name:'Blindaje',type:'bar',
+     marker:{color:GR},
+     text:blQ.map(v=>v>0?(v/1000).toFixed(1)+'K':''),
+     textposition:'outside',textfont:{size:11,color:GR}}
+  ],{...BLY,
+    barmode:'group',
+    bargap:0.2,
+    bargroupgap:0.06,
+    xaxis:{title:'',gridcolor:'#f0f4f8',tickfont:{size:13}},
+    yaxis:{gridcolor:'#f0f4f8',tickformat:',.0f',tickfont:{size:12},range:[0,70000]},
+    legend:{orientation:'h',y:-0.18,x:.5,xanchor:'center',font:{size:13}},
+    margin:{t:30,r:12,b:55,l:60}
+  },cfg);
+
+  /* ── C7: Ruta Julio — barras coloreadas por SPD + línea acumulada ── */
+  let cum=0;
+  const acum=RUTA.map(r=>{cum+=r.vent;return cum;});
+  const sColors=RUTA.map(r=>r.spd>=12?GR:r.spd>=8?YL:RD);
+  const el7=document.getElementById('c-ruta');el7.innerHTML='';
+  Plotly.newPlot(el7,[
+    {x:RUTA.map(r=>r.dia),
+     y:RUTA.map(r=>r.vent),
+     name:'Ventas / Día',type:'bar',
+     marker:{color:sColors,line:{color:'rgba(255,255,255,0.2)',width:1}},
+     yaxis:'y',
+     text:RUTA.map(r=>'<b>'+r.vent+'</b>'),
+     textposition:'outside',
+     textfont:{size:10,color:'#374151'},
+     hovertemplate:'<b>%{x}</b><br>Ventas: %{y}  SPD: '+RUTA.map(r=>r.spd.toFixed(1)).join('|')+'<extra></extra>'},
+    {x:RUTA.map(r=>r.dia),
+     y:acum,
+     name:'Acumulado',type:'scatter',
+     mode:'lines+markers',yaxis:'y2',
+     line:{color:N,width:3},
+     marker:{color:N,size:7,line:{color:'#fff',width:2}},
+     text:acum.map((v,i)=>(i===acum.length-1||i===Math.floor(acum.length/2)-1)?'<b>'+v.toLocaleString('es-PE')+'</b>':''),
+     textposition:'top center',
+     textfont:{size:11,color:N},
+     hovertemplate:'Acumulado: <b>%{y:,}</b><extra></extra>'}
+  ],{...BLY,
+    xaxis:{gridcolor:'#f0f4f8',tickangle:-50,tickfont:{size:10}},
+    yaxis:{gridcolor:'#f0f4f8',tickfont:{size:11},range:[0,1380]},
+    yaxis2:{overlaying:'y',side:'right',gridcolor:'rgba(0,0,0,0)',
+            tickformat:',',tickfont:{size:11}},
+    legend:{orientation:'h',y:-0.30,x:.5,xanchor:'center',font:{size:12}},
+    margin:{t:28,r:65,b:78,l:50}
+  },cfg);
+}
+
+window.addEventListener('load',function(){
+  buildTbMigra();buildTbBlind();buildTbPlan();buildTbDistr();
+  initCharts();
+});
+</script>
+</body>
+</html>
