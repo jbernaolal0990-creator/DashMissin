@@ -110,6 +110,7 @@ tbody tr:hover{background:var(--card2);}
     <button class="navbtn" data-tab="t5">5 · Proyección Campaña</button>
     <button class="navbtn" data-tab="t6">6 · Comparativo Día</button>
     <button class="navbtn" data-tab="t7">7 · Ruta Mes</button>
+    <button class="navbtn" data-tab="t8">8 · Resumen Mensual</button>
   </div>
 
   <!-- ============ TAB 1 :: RESUMEN DE INDICADORES ============ -->
@@ -541,6 +542,43 @@ tbody tr:hover{background:var(--card2);}
         </tr></thead>
         <tbody></tbody>
         <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ TAB 8 :: RESUMEN MENSUAL ============ -->
+  <div class="tabpanel" id="t8">
+    <div class="note">Meta mensual de campaña ingresada manualmente. Cierre/Avance = Ventas Totales reales del mes (todos los días, según cierre de nómina). Proyección = igual al Cierre/Avance para meses ya cerrados; para el <b>mes en curso</b> se calcula según la Ruta ya integrada (hoja "Ruta Mes"). Cumplimiento = Proyección / Meta.</div>
+
+    <div class="sectionlabel">Meta vs Cierre/Avance · Ene–Ago 2026</div>
+    <div class="tblwrap">
+      <table id="t8-monthly-table">
+        <thead><tr>
+          <th data-k="mes">Mes</th><th data-k="meta">Meta</th><th data-k="cierre">Cierre/Avance</th>
+          <th data-k="proyeccion">Proyección</th><th data-k="cumplimiento">Cumplimiento</th>
+        </tr></thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+
+    <div class="sectionlabel">Detalle por Supervisor</div>
+    <div class="filters">
+      <div class="filtergroup"><span class="flabel">Mes:</span><span id="t8-mes-badges"></span></div>
+    </div>
+    <div class="filters">
+      <div class="filtergroup"><span class="flabel">Supervisor:</span><span id="t8-sup-badges"></span></div>
+      <button class="clearbtn" id="t8-clear">Limpiar filtros</button>
+    </div>
+    <div class="note">Meta por supervisor: pendiente de recibir — se agregará la columna Cumplimiento por supervisor en cuanto se comparta.</div>
+
+    <div class="tblwrap">
+      <table id="t8-sup-table">
+        <thead><tr>
+          <th data-k="sup">Supervisor</th><th data-k="cierre">Cierre/Avance</th><th data-k="asesores">Asesores</th>
+          <th data-k="hcProm">HC Prom. Conectado</th><th data-k="spd">SPD Total</th><th data-k="meta">Meta</th><th data-k="cumplimiento">Cumplimiento</th>
+        </tr></thead>
+        <tbody></tbody>
       </table>
     </div>
   </div>
@@ -2250,6 +2288,111 @@ function updateTab7(){
 }
 
 /* ============================================================
+   TAB 8 :: RESUMEN MENSUAL
+   ============================================================ */
+// Meta mensual de campaña (dato ingresado manualmente por Jose, no viene de ningun archivo).
+const MONTHLY_META = {'Enero':30300,'Febrero':29000,'Marzo':31000,'Abril':30000,'Mayo':31500,'Junio':29200,'Julio':26700,'Agosto':20135};
+
+let t8Mes = new Set();
+let t8Sup = new Set();
+
+function t8CierreAvance(mes){
+  return DATA.daily_route.filter(r=>r.mes===mes).reduce((s,r)=>s+r.vv_totales,0);
+}
+
+function t8Proyeccion(mes, cierre){
+  const lastMes = DATA.months_order[DATA.months_order.length-1];
+  const rm = (DATA.route_meta || {})[mes];
+  if(mes === lastMes && rm && rm.ruta_netcall_mes!==undefined && rm.ruta_netcall_mes!==null){
+    return rm.ruta_netcall_mes;
+  }
+  return cierre;
+}
+
+function renderTab8Badges(){
+  const mesBox = document.getElementById('t8-mes-badges');
+  mesBox.innerHTML = DATA.months_order.map(m=>`<span class="badge" data-mes="${m}">${m}</span>`).join('');
+  mesBox.querySelectorAll('.badge').forEach(b=>b.addEventListener('click', ()=>{
+    const v = b.dataset.mes;
+    t8Mes.has(v)? t8Mes.delete(v) : t8Mes.add(v);
+    b.classList.toggle('on');
+    updateTab8();
+  }));
+
+  const supNames = [...new Set(DATA.raw_daily.filter(r=>r.u!=='PENDIENTE').map(r=>r.u))].sort();
+  const supBox = document.getElementById('t8-sup-badges');
+  supBox.innerHTML = supNames.map(s=>`<span class="badge" data-sup="${s}">${s.split(' ')[0]}</span>`).join('');
+  supBox.querySelectorAll('.badge').forEach(b=>b.addEventListener('click', ()=>{
+    const v = b.dataset.sup;
+    t8Sup.has(v)? t8Sup.delete(v) : t8Sup.add(v);
+    b.classList.toggle('on');
+    updateTab8();
+  }));
+
+  document.getElementById('t8-clear').addEventListener('click', ()=>{
+    t8Mes.clear(); t8Sup.clear();
+    mesBox.querySelectorAll('.badge').forEach(x=>x.classList.remove('on'));
+    supBox.querySelectorAll('.badge').forEach(x=>x.classList.remove('on'));
+    updateTab8();
+  });
+}
+
+function t8SupAgg(){
+  // Cierre/Avance: ventas totales (TODOS los dias, laborable + no laborable) -- misma convencion que la
+  // tabla mensual de arriba y que RUTA MES. Asesores/HC/SPD: solo dias laborables (misma convencion que
+  // el resto del dashboard para "SPD Total").
+  const mesesActivos = t8Mes.size>0 ? [...t8Mes] : DATA.months_order;
+  const map = {};
+  DATA.raw_daily.forEach(r=>{
+    if(r.u==='PENDIENTE') return;
+    if(!mesesActivos.includes(r.m)) return;
+    if(t8Sup.size>0 && !t8Sup.has(r.u)) return;
+    if(!map[r.u]) map[r.u] = {sup:r.u, vvAll:0, vvLab:0, hcLab:0, asesoresSet:new Set(), diasLabSet:new Set()};
+    map[r.u].vvAll += r.v;
+    if(r.t==='LABORABLE'){
+      map[r.u].vvLab += r.v;
+      if(r.i===1) map[r.u].hcLab += 1;
+      map[r.u].asesoresSet.add(r.n);
+      map[r.u].diasLabSet.add(r.m+'|'+r.d);
+    }
+  });
+  return Object.values(map).map(x=>{
+    const spd = x.hcLab ? x.vvLab/x.hcLab : 0;
+    const hcProm = x.diasLabSet.size ? x.hcLab/x.diasLabSet.size : 0;
+    return { sup:x.sup, cierre:x.vvAll, asesores:x.asesoresSet.size, hcProm, spd };
+  }).sort((a,b)=>b.cierre-a.cierre);
+}
+
+function updateTab8(){
+  // ---- Tabla mensual Meta vs Cierre/Avance ----
+  const tb = document.querySelector('#t8-monthly-table tbody');
+  let totMeta=0, totCierre=0, totProy=0;
+  tb.innerHTML = DATA.months_order.map(m=>{
+    const meta = MONTHLY_META[m] || 0;
+    const cierre = t8CierreAvance(m);
+    const proy = t8Proyeccion(m, cierre);
+    const cumplim = meta ? (proy/meta*100) : 0;
+    totMeta += meta; totCierre += cierre; totProy += proy;
+    const color = cumplim>=100 ? '#1E8E5A' : (cumplim>=90 ? '#E8951E' : '#C0392B');
+    return `<tr><td><b>${m}</b></td><td>${fmt(meta)}</td><td>${fmt(cierre)}</td><td>${fmt(proy)}</td>
+      <td style="color:${color};font-weight:700;">${fmt1(cumplim)}%</td></tr>`;
+  }).join('');
+  const tf = document.querySelector('#t8-monthly-table tfoot');
+  const cumplimTotal = totMeta ? (totProy/totMeta*100) : 0;
+  tf.innerHTML = `<tr style="font-weight:700;background:var(--card2);">
+    <td>TOTAL</td><td>${fmt(totMeta)}</td><td>${fmt(totCierre)}</td><td>${fmt(totProy)}</td>
+    <td>${fmt1(cumplimTotal)}%</td></tr>`;
+
+  // ---- Detalle por Supervisor ----
+  const supRows = t8SupAgg();
+  const stb = document.querySelector('#t8-sup-table tbody');
+  stb.innerHTML = supRows.map(r=>`<tr>
+      <td>${r.sup}</td><td>${fmt(r.cierre)}</td><td>${fmt(r.asesores)}</td>
+      <td>${fmt1(r.hcProm)}</td><td>${fmt2(r.spd)}</td><td style="color:var(--text3)">Pendiente</td><td style="color:var(--text3)">—</td>
+    </tr>`).join('');
+}
+
+/* ============================================================
    NAV / INIT
    ============================================================ */
 document.querySelectorAll('.navbtn').forEach(btn=>{
@@ -2268,6 +2411,7 @@ renderTab4Badges(); updateTab4();
 renderTab5Badges(); updateTab5();
 renderTab6Badges(); updateTab6();
 renderTab7Badges(); updateTab7();
+renderTab8Badges(); updateTab8();
 </script>
 </body>
 </html>
