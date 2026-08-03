@@ -154,15 +154,25 @@ tbody tr:hover{background:var(--card2);}
 
     <div class="cgrid wide">
       <div class="ccard">
-        <div class="ctitle"><span>Tendencia mensual · Ventas Totales vs SPD Total</span><span class="ctag">Ene–Jul 2026</span></div>
-        <div class="chartbox tall"><canvas id="c1_trend" role="img" aria-label="Tendencia mensual de ventas totales y SPD Total"></canvas></div>
+        <div class="ctitle"><span>Tendencia mensual · HC y Productividad</span><span class="ctag">Ene–Jul 2026</span></div>
+        <div class="tblwrap">
+          <table id="t1-trend-table">
+            <thead><tr><th>Mes</th><th>HC Activo</th><th>HC Prom. Conectado</th><th>Ventas Totales</th><th>Productividad</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <div class="cgrid">
       <div class="ccard">
-        <div class="ctitle"><span>Ventas Totales por Cuartil y Mes</span><span class="ctag">Apilado</span></div>
-        <div class="chartbox"><canvas id="c1_cuartilmes" role="img" aria-label="Ventas Totales apiladas por cuartil y mes"></canvas></div>
+        <div class="ctitle"><span>Ventas Totales por Cuartil y Mes</span><span class="ctag">Detalle</span></div>
+        <div class="tblwrap">
+          <table id="t1-cuartil-mes-table">
+            <thead><tr><th>Mes</th><th>Cuartil</th><th>HC Activo</th><th>HC Prom. Conectado</th><th>Ventas Totales</th><th>Productividad</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
       <div class="ccard">
         <div class="ctitle"><span>Distribución total de Ventas Totales por Cuartil</span><span class="ctag">6 meses</span></div>
@@ -175,6 +185,18 @@ tbody tr:hover{background:var(--card2);}
       <div class="ccard">
         <div class="ctitle"><span>HC Promedio Conectado por Mes</span><span class="ctag">Headcount MIGRA</span></div>
         <div class="chartbox"><canvas id="c1_hc" role="img" aria-label="HC promedio conectado por mes"></canvas></div>
+      </div>
+    </div>
+
+    <div class="cgrid wide">
+      <div class="ccard">
+        <div class="ctitle"><span>Ventas Totales por Antigüedad 2 y Mes</span><span class="ctag">Detalle</span></div>
+        <div class="tblwrap">
+          <table id="t1-antiguedad2-mes-table">
+            <thead><tr><th>Mes</th><th>Antigüedad 2</th><th>HC Activo</th><th>HC Prom. Conectado</th><th>Ventas Totales</th><th>Productividad</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -718,6 +740,39 @@ function t1AntiguedadTotals(){
   return Object.entries(acc).map(([k,x])=>({ antiguedad:k, vv_base_total:x.vv, spd_base: x.hcExp? x.vv/x.hcExp:0, asesoresAvg: x.months.size? x.asesoresSum/x.months.size:0 }));
 }
 
+// Combina subgrupos (estado x tipo_dia) de una tabla mensual-por-grupo (monthly_cuartil / monthly_antiguedad2)
+// en filas planas Mes x Grupo, con HC Activo y HC Prom. Conectado calculados correctamente (sin diluir por
+// dias placeholder ni doble-contar personas entre Laborable/No Laborable).
+function t1GroupByMonth(sourceRows, groupField, groupList, segFn){
+  const acc = {};
+  sourceRows.forEach(r=>{
+    if(!t1Match(r)) return;
+    if(t1Seg.size>0 && segFn && !t1Seg.has(segFn(r[groupField]))) return;
+    const k = r.mes+'|'+r[groupField];
+    if(!acc[k]) acc[k] = {vv:0, hcExp:0, asesoresMax:0, diasConHcMax:0, present:false};
+    acc[k].vv += r.vv_base_total;
+    acc[k].hcExp += r.hc_conectado;
+    acc[k].asesoresMax = Math.max(acc[k].asesoresMax, r.asesores||0);
+    acc[k].diasConHcMax = Math.max(acc[k].diasConHcMax, r.dias_con_hc||0);
+    acc[k].present = true;
+  });
+  const rows = [];
+  t1FilteredMonths().forEach(m=>{
+    groupList.forEach(g=>{
+      const x = acc[m+'|'+g];
+      if(!x || !x.present) return;
+      rows.push({
+        mes:m, grupo:g,
+        asesores:x.asesoresMax,
+        hc_promedio: x.diasConHcMax? x.hcExp/x.diasConHcMax : 0,
+        vv:x.vv,
+        spd: x.hcExp? x.vv/x.hcExp : 0
+      });
+    });
+  });
+  return rows;
+}
+
 function renderTab1Badges(){
   const mesBox = document.getElementById('t1-mes-badges');
   mesBox.innerHTML = DATA.months_order.map(m=>`<span class="badge" data-mes="${m}">${m}</span>`).join('');
@@ -791,60 +846,21 @@ function updateTab1(){
     <div class="kcard"><div class="klabel">Variación Ene → Jun</div><div class="kval" style="color:${variacion>=0?'#10B981':'#EF4444'}">${variacion>=0?'+':''}${fmt1(variacion)}%</div><div class="ksub">Ventas Totales</div></div>
   `;
 
-  if(charts.c1_trend) charts.c1_trend.destroy();
-  charts.c1_trend = new Chart(document.getElementById('c1_trend'), {
-    data:{
-      labels: ms.map(r=>r.mes),
-      datasets:[
-        {type:'bar', label:'Ventas Totales', data:ms.map(r=>r.vv_base_total), backgroundColor:'#E8541E', borderRadius:5, yAxisID:'y', order:3,
-          datalabels: dlBar({color:'#14235C'})},
-        {type:'line', label:'SPD Total', data:ms.map(r=>r.spd_base), borderColor:'#2E5CAD', backgroundColor:'#2E5CAD', tension:.35, yAxisID:'y1', order:1, pointRadius:4, pointBackgroundColor:'#2E5CAD',
-          datalabels: dlLine({color:'#1E3F73', formatter:v=>fmt2(v)})},
-        {type:'line', label:'HC Prom. Conectado', data:ms.map(r=>r.hc_promedio_conectado), borderColor:'#1590A6', backgroundColor:'#1590A6', borderDash:[4,3], tension:.35, yAxisID:'y2', order:2, pointRadius:4, pointBackgroundColor:'#1590A6',
-          datalabels: dlLine({color:'#0E6E7D', formatter:v=>fmt1(v)})}
-      ]
-    },
-    options: baseOpts({
-      plugins:{legend:{display:true, labels:{color:textColor,usePointStyle:true,font:{size:11}}}, tooltip:baseOpts().plugins.tooltip},
-      scales:{
-        x:{ticks:{color:textColor}, grid:{display:false}},
-        y:{position:'left', ticks:{color:textColor}, grid:{color:gridColor}, title:{display:true,text:'Ventas Totales',color:textColor,font:{size:10}}},
-        y1:{position:'right', ticks:{color:textColor}, grid:{display:false}, title:{display:true,text:'SPD Total',color:textColor,font:{size:10}}},
-        y2:{position:'right', display:false, grid:{display:false}}
-      }
-    })
-  });
+  // ---- Tabla: Tendencia mensual (HC y Productividad) ----
+  const tbTrend = document.querySelector('#t1-trend-table tbody');
+  tbTrend.innerHTML = ms.map(r=>`<tr><td>${r.mes}</td><td>${fmt(r.asesores_activos)}</td><td>${fmt1(r.hc_promedio_conectado)}</td><td>${fmt(r.vv_base_total)}</td><td>${fmt2(r.spd_base)}</td></tr>`).join('');
 
-  const cuartiles = ['Q1','Q2','Q3','Q4','OJT'];
-  const mesesOrder = t1FilteredMonths();
-  const cLookup = t1CuartilLookup();
-  const hcByMes = {}; ms.forEach(r=> hcByMes[r.mes] = r.hc_promedio_conectado);
-  if(charts.c1_cuartilmes) charts.c1_cuartilmes.destroy();
-  charts.c1_cuartilmes = new Chart(document.getElementById('c1_cuartilmes'), {
-    data:{
-      labels: mesesOrder,
-      datasets: [
-        ...cuartiles.map(q=>({
-          type:'bar', label:q, yAxisID:'y',
-          data: mesesOrder.map(m=> cLookup[m+'|'+q]||0),
-          backgroundColor: QC[q],
-          datalabels: dlStack({min:800})
-        })),
-        {type:'line', label:'HC Prom. Conectado', yAxisID:'y1',
-          data: mesesOrder.map(m=> hcByMes[m]||0),
-          borderColor:'#1590A6', backgroundColor:'#1590A6', borderDash:[4,3], tension:.35, pointRadius:4, pointBackgroundColor:'#1590A6',
-          datalabels: dlLine({color:'#0E6E7D', formatter:v=>fmt1(v)})}
-      ]
-    },
-    options: baseOpts({
-      plugins:{legend:{display:true, position:'bottom', labels:{color:textColor,boxWidth:10,font:{size:10}}}},
-      scales:{
-        x:{stacked:true, ticks:{color:textColor}, grid:{display:false}},
-        y:{stacked:true, ticks:{color:textColor}, grid:{color:gridColor}, title:{display:true,text:'Ventas Totales',color:textColor,font:{size:10}}},
-        y1:{position:'right', ticks:{color:textColor}, grid:{display:false}, title:{display:true,text:'HC Prom. Conectado',color:textColor,font:{size:10}}}
-      }
-    })
-  });
+  // ---- Tabla: Ventas Totales por Cuartil y Mes ----
+  const cuartilesOrdered = ['Q1','Q2','Q3','Q4','OJT'];
+  const cuartilMesRows = t1GroupByMonth(DATA.monthly_cuartil, 'cuartil', cuartilesOrdered, segFromCuartil);
+  const tbCuartilMes = document.querySelector('#t1-cuartil-mes-table tbody');
+  tbCuartilMes.innerHTML = cuartilMesRows.map(r=>`<tr><td>${r.mes}</td><td><span class="q-pill" style="background:${QC[r.grupo]||'#9AA3BE'}22;color:${QC[r.grupo]||'#5A6484'}">${r.grupo}</span></td><td>${fmt(r.asesores)}</td><td>${fmt1(r.hc_promedio)}</td><td>${fmt(r.vv)}</td><td>${fmt2(r.spd)}</td></tr>`).join('');
+
+  // ---- Tabla: Ventas Totales por Antigüedad 2 y Mes ----
+  const antiguedad2Ordered = ['0 meses','1 mes','2 meses','<6 meses','>=6 meses','OJT'];
+  const antiguedad2MesRows = t1GroupByMonth(DATA.monthly_antiguedad2, 'antiguedad2', antiguedad2Ordered, segFromAntiguedad2);
+  const tbAntiguedad2Mes = document.querySelector('#t1-antiguedad2-mes-table tbody');
+  tbAntiguedad2Mes.innerHTML = antiguedad2MesRows.map(r=>`<tr><td>${r.mes}</td><td><span class="q-pill" style="background:${AC2[r.grupo]||'#9AA3BE'}22;color:${AC2[r.grupo]||'#5A6484'}">${r.grupo}</span></td><td>${fmt(r.asesores)}</td><td>${fmt1(r.hc_promedio)}</td><td>${fmt(r.vv)}</td><td>${fmt2(r.spd)}</td></tr>`).join('');
 
   const ct = t1CuartilTotals();
   if(charts.c1_cuartildona) charts.c1_cuartildona.destroy();
