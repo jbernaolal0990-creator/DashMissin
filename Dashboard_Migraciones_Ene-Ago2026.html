@@ -90,32 +90,6 @@ tbody tr:hover{background:var(--card2);}
 </style>
 </head>
 <body>
-<div id="__pwgate" style="position:fixed;inset:0;z-index:999999;background:#0F1B45;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
-  <div style="background:#FFFFFF;border-radius:14px;padding:36px 32px;width:320px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center;">
-    <div style="font-weight:800;font-size:15px;letter-spacing:.06em;color:#14235C;margin-bottom:4px;">NETCALL GROUP</div>
-    <div style="font-size:13px;color:#5A6484;margin-bottom:18px;">Dashboard Migraciones &middot; Acceso restringido</div>
-    <input id="__pwinput" type="password" placeholder="Clave de acceso" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #D8DCEA;border-radius:8px;font-size:14px;margin-bottom:10px;outline:none;" />
-    <div id="__pwerror" style="color:#C0392B;font-size:12px;min-height:16px;margin-bottom:10px;"></div>
-    <button id="__pwbtn" style="width:100%;padding:10px;border:none;border-radius:8px;background:#E8541E;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">Ingresar</button>
-  </div>
-</div>
-<script>
-(function(){
-  var PW = "123456";
-  var gate = document.getElementById('__pwgate');
-  var input = document.getElementById('__pwinput');
-  var btn = document.getElementById('__pwbtn');
-  var err = document.getElementById('__pwerror');
-  function tryUnlock(){
-    if(input.value === PW){ gate.style.display = 'none'; }
-    else { err.textContent = 'Clave incorrecta'; input.value=''; input.focus(); }
-  }
-  btn.addEventListener('click', tryUnlock);
-  input.addEventListener('keydown', function(e){ if(e.key==='Enter') tryUnlock(); });
-  setTimeout(function(){ input.focus(); }, 100);
-})();
-</script>
-
 <div class="wrap">
 
   <div class="header">
