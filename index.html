@@ -65,7 +65,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .chartbox{position:relative;height:260px;}
 .chartbox.tall{height:340px;}
 
-.tblwrap{background:var(--card);border-radius:14px;border:0.5px solid var(--border);padding:13px 15px;overflow:auto;max-height:560px;}
+.tblwrap{background:var(--card);border-radius:14px;border:0.5px solid var(--border);padding:13px 15px;overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12.5px;}
 thead th{position:sticky;top:0;background:var(--card2);color:var(--text2);text-align:left;padding:9px 10px;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;cursor:pointer;white-space:nowrap;border-bottom:1px solid var(--border2);}
 thead th:hover{color:var(--text);}
@@ -164,7 +164,7 @@ tbody tr:hover{background:var(--card2);}
       </div>
     </div>
 
-    <div class="cgrid">
+    <div class="cgrid wide">
       <div class="ccard">
         <div class="ctitle"><span>Ventas Totales por Cuartil y Mes</span><span class="ctag">Detalle</span></div>
         <div class="tblwrap">
@@ -173,18 +173,6 @@ tbody tr:hover{background:var(--card2);}
             <tbody></tbody>
           </table>
         </div>
-      </div>
-      <div class="ccard">
-        <div class="ctitle"><span>Distribución total de Ventas Totales por Cuartil</span><span class="ctag">6 meses</span></div>
-        <div class="chartbox"><canvas id="c1_cuartildona" role="img" aria-label="Distribución de ventas totales por cuartil"></canvas></div>
-      </div>
-      <div class="ccard">
-        <div class="ctitle"><span>SPD Total por Cuartil</span><span class="ctag">Promedio 6 meses</span></div>
-        <div class="chartbox"><canvas id="c1_spdcuartil" role="img" aria-label="SPD Total por cuartil"></canvas></div>
-      </div>
-      <div class="ccard">
-        <div class="ctitle"><span>HC Promedio Conectado por Mes</span><span class="ctag">Headcount MIGRA</span></div>
-        <div class="chartbox"><canvas id="c1_hc" role="img" aria-label="HC promedio conectado por mes"></canvas></div>
       </div>
     </div>
 
@@ -863,26 +851,6 @@ function updateTab1(){
   tbAntiguedad2Mes.innerHTML = antiguedad2MesRows.map(r=>`<tr><td>${r.mes}</td><td><span class="q-pill" style="background:${AC2[r.grupo]||'#9AA3BE'}22;color:${AC2[r.grupo]||'#5A6484'}">${r.grupo}</span></td><td>${fmt(r.asesores)}</td><td>${fmt1(r.hc_promedio)}</td><td>${fmt(r.vv)}</td><td>${fmt2(r.spd)}</td></tr>`).join('');
 
   const ct = t1CuartilTotals();
-  if(charts.c1_cuartildona) charts.c1_cuartildona.destroy();
-  charts.c1_cuartildona = new Chart(document.getElementById('c1_cuartildona'), {
-    type:'doughnut',
-    data:{ labels: ct.map(r=>r.cuartil), datasets:[{data: ct.map(r=>r.vv_base_total), backgroundColor: ct.map(r=>QC[r.cuartil]||'#666'), borderColor:'#FFFFFF', borderWidth:2, datalabels: dlDonut()}] },
-    options:{ responsive:true, maintainAspectRatio:false, animation:{duration:250}, plugins:{legend:{display:true,position:'bottom',labels:{color:textColor,boxWidth:10,font:{size:10}}}, tooltip:baseOpts().plugins.tooltip} }
-  });
-
-  if(charts.c1_spdcuartil) charts.c1_spdcuartil.destroy();
-  charts.c1_spdcuartil = new Chart(document.getElementById('c1_spdcuartil'), {
-    type:'bar',
-    data:{ labels: ct.map(r=>r.cuartil), datasets:[{label:'SPD Total', data: ct.map(r=>r.spd_base), backgroundColor: ct.map(r=>QC[r.cuartil]||'#666'), borderRadius:5, datalabels: dlBar({formatter:v=>fmt2(v)})}] },
-    options: baseOpts()
-  });
-
-  if(charts.c1_hc) charts.c1_hc.destroy();
-  charts.c1_hc = new Chart(document.getElementById('c1_hc'), {
-    type:'bar',
-    data:{ labels: ms.map(r=>r.mes), datasets:[{label:'HC Prom. Conectado', data: ms.map(r=>r.hc_promedio_conectado), backgroundColor:'#1590A6', borderRadius:5, datalabels: dlBar({color:'#14235C', formatter:v=>fmt1(v)})}] },
-    options: baseOpts()
-  });
 
   const q1 = ct.find(r=>r.cuartil==='Q1'), q4 = ct.find(r=>r.cuartil==='Q4');
   const q1pct = totalVV? (q1.vv_base_total/totalVV*100):0;
