@@ -448,6 +448,9 @@ tbody tr:hover{background:var(--card2);}
 
     <div class="sectionlabel" id="t5-proj-section-label">Proyección</div>
     <div class="filters">
+      <div class="filtergroup"><span class="flabel">Mes a proyectar:</span><span id="t5-projmes-badges"></span></div>
+    </div>
+    <div class="filters">
       <div class="filtergroup"><span class="flabel">Meta de campaña (Ventas Totales):</span>
         <input class="numinput" id="t5-meta" type="number" min="0" step="100" value="24500" style="width:90px;">
       </div>
@@ -641,6 +644,17 @@ function getProjectionMonth(){
   const nextIdx = (lastIdx + 1) % 12;
   const nextYear = DASH_YEAR + (lastIdx===11 ? 1 : 0);
   return { name: MONTH_NAMES_FULL[nextIdx], monthIdx: nextIdx, year: nextYear, feriados: PERU_HOLIDAYS_FIXED[nextIdx] || [] };
+}
+
+// Permite al usuario elegir manualmente el mes a proyectar (badges en Tab5). Si no eligio ninguno
+// (t5MesOverride === null), se mantiene el comportamiento automatico de getProjectionMonth().
+let t5MesOverride = null;
+function getProjectionMonthResolved(){
+  if(t5MesOverride){
+    const idx = MES_TO_MONTHIDX[t5MesOverride];
+    return { name: t5MesOverride, monthIdx: idx, year: DASH_YEAR, feriados: PERU_HOLIDAYS_FIXED[idx] || [] };
+  }
+  return getProjectionMonth();
 }
 
 const textColor = '#5A6484';
@@ -1687,7 +1701,7 @@ let t5Sup = new Set();
 let t5Meta = 24500;
 
 function projCalendar(){
-  const proj = getProjectionMonth();
+  const proj = getProjectionMonthResolved();
   return buildMonthDays(proj.monthIdx, proj.year, proj.feriados);
 }
 
@@ -1766,6 +1780,16 @@ function renderTab5Badges(){
     t5Meta = isNaN(v) ? 0 : v;
     updateTab5();
   });
+
+  const pmBox = document.getElementById('t5-projmes-badges');
+  const pmOptions = [{v:null, label:'Automático (mes en curso)'}].concat(MONTH_NAMES_FULL.map(m=>({v:m, label:m})));
+  pmBox.innerHTML = pmOptions.map(o=>`<span class="badge${o.v===t5MesOverride?' on':''}" data-mes="${o.v||''}">${o.label}</span>`).join('');
+  pmBox.querySelectorAll('.badge').forEach(b=>b.addEventListener('click', ()=>{
+    t5MesOverride = b.dataset.mes || null;
+    pmBox.querySelectorAll('.badge').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    updateTab5();
+  }));
 }
 
 function t5PivotData(){
@@ -1847,7 +1871,7 @@ function updateTab5Projection(promedios){
     return { dia:x.dia, weekday:x.weekday, peso, meta, metaPlana, acumulado };
   });
 
-  const proj = getProjectionMonth();
+  const proj = getProjectionMonthResolved();
   document.getElementById('t5-proj-section-label').textContent = `Proyección ${proj.name} ${proj.year}`;
   document.getElementById('t5-proj-title').textContent = `Meta diaria sugerida · ${proj.name} ${proj.year} (${cal.length} días laborables)`;
 
