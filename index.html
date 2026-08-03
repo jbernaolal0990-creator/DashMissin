@@ -796,10 +796,12 @@ function updateTab1(){
     data:{
       labels: ms.map(r=>r.mes),
       datasets:[
-        {type:'bar', label:'Ventas Totales', data:ms.map(r=>r.vv_base_total), backgroundColor:'#E8541E', borderRadius:5, yAxisID:'y', order:2,
+        {type:'bar', label:'Ventas Totales', data:ms.map(r=>r.vv_base_total), backgroundColor:'#E8541E', borderRadius:5, yAxisID:'y', order:3,
           datalabels: dlBar({color:'#14235C'})},
         {type:'line', label:'SPD Total', data:ms.map(r=>r.spd_base), borderColor:'#2E5CAD', backgroundColor:'#2E5CAD', tension:.35, yAxisID:'y1', order:1, pointRadius:4, pointBackgroundColor:'#2E5CAD',
-          datalabels: dlLine({color:'#1E3F73', formatter:v=>fmt2(v)})}
+          datalabels: dlLine({color:'#1E3F73', formatter:v=>fmt2(v)})},
+        {type:'line', label:'HC Prom. Conectado', data:ms.map(r=>r.hc_promedio_conectado), borderColor:'#1590A6', backgroundColor:'#1590A6', borderDash:[4,3], tension:.35, yAxisID:'y2', order:2, pointRadius:4, pointBackgroundColor:'#1590A6',
+          datalabels: dlLine({color:'#0E6E7D', formatter:v=>fmt1(v)})}
       ]
     },
     options: baseOpts({
@@ -807,7 +809,8 @@ function updateTab1(){
       scales:{
         x:{ticks:{color:textColor}, grid:{display:false}},
         y:{position:'left', ticks:{color:textColor}, grid:{color:gridColor}, title:{display:true,text:'Ventas Totales',color:textColor,font:{size:10}}},
-        y1:{position:'right', ticks:{color:textColor}, grid:{display:false}, title:{display:true,text:'SPD Total',color:textColor,font:{size:10}}}
+        y1:{position:'right', ticks:{color:textColor}, grid:{display:false}, title:{display:true,text:'SPD Total',color:textColor,font:{size:10}}},
+        y2:{position:'right', display:false, grid:{display:false}}
       }
     })
   });
@@ -815,21 +818,31 @@ function updateTab1(){
   const cuartiles = ['Q1','Q2','Q3','Q4','OJT'];
   const mesesOrder = t1FilteredMonths();
   const cLookup = t1CuartilLookup();
+  const hcByMes = {}; ms.forEach(r=> hcByMes[r.mes] = r.hc_promedio_conectado);
   if(charts.c1_cuartilmes) charts.c1_cuartilmes.destroy();
   charts.c1_cuartilmes = new Chart(document.getElementById('c1_cuartilmes'), {
-    type:'bar',
     data:{
       labels: mesesOrder,
-      datasets: cuartiles.map(q=>({
-        label:q,
-        data: mesesOrder.map(m=> cLookup[m+'|'+q]||0),
-        backgroundColor: QC[q],
-        datalabels: dlStack({min:800})
-      }))
+      datasets: [
+        ...cuartiles.map(q=>({
+          type:'bar', label:q, yAxisID:'y',
+          data: mesesOrder.map(m=> cLookup[m+'|'+q]||0),
+          backgroundColor: QC[q],
+          datalabels: dlStack({min:800})
+        })),
+        {type:'line', label:'HC Prom. Conectado', yAxisID:'y1',
+          data: mesesOrder.map(m=> hcByMes[m]||0),
+          borderColor:'#1590A6', backgroundColor:'#1590A6', borderDash:[4,3], tension:.35, pointRadius:4, pointBackgroundColor:'#1590A6',
+          datalabels: dlLine({color:'#0E6E7D', formatter:v=>fmt1(v)})}
+      ]
     },
     options: baseOpts({
       plugins:{legend:{display:true, position:'bottom', labels:{color:textColor,boxWidth:10,font:{size:10}}}},
-      scales:{ x:{stacked:true, ticks:{color:textColor}, grid:{display:false}}, y:{stacked:true, ticks:{color:textColor}, grid:{color:gridColor}} }
+      scales:{
+        x:{stacked:true, ticks:{color:textColor}, grid:{display:false}},
+        y:{stacked:true, ticks:{color:textColor}, grid:{color:gridColor}, title:{display:true,text:'Ventas Totales',color:textColor,font:{size:10}}},
+        y1:{position:'right', ticks:{color:textColor}, grid:{display:false}, title:{display:true,text:'HC Prom. Conectado',color:textColor,font:{size:10}}}
+      }
     })
   });
 
